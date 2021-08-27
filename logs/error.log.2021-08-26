@@ -1,0 +1,39 @@
+2021-08-26 11:29:19  [ main:0 ] - [ ERROR ]  org.postgresql.util.PSQLException: 致命错误: 用户 "postgre" Password 认证失败 (pgjdbc: autodetected server-encoding to be GB2312, if the message is not readable, please check database logs and/or host, port, dbname, user, password, pg_hba.conf)
+2021-08-26 11:31:05  [ main:0 ] - [ ERROR ]  org.postgresql.util.PSQLException: 查询结果指标位置不正确，您也许需要呼叫 ResultSet 的 next() 方法。
+2021-08-26 11:31:41  [ main:0 ] - [ ERROR ]  org.postgresql.util.PSQLException: 查询结果指标位置不正确，您也许需要呼叫 ResultSet 的 next() 方法。
+2021-08-26 11:32:04  [ main:0 ] - [ ERROR ]  org.postgresql.util.PSQLException: 查询结果指标位置不正确，您也许需要呼叫 ResultSet 的 next() 方法。
+2021-08-26 11:33:13  [ main:0 ] - [ ERROR ]  org.postgresql.util.PSQLException: 错误: 函数 pg_logical_slot_peek(unknown, unknown, unknown) 不存在
+  建议：没有匹配指定名称和参数类型的函数. 您也许需要增加明确的类型转换.
+  位置：16
+2021-08-26 11:35:21  [ main:0 ] - [ ERROR ]  org.postgresql.util.PSQLException: 错误: 函数 pg_logical_slot_peek(unknown, unknown, unknown) 不存在
+  建议：没有匹配指定名称和参数类型的函数. 您也许需要增加明确的类型转换.
+  位置：16
+2021-08-26 11:36:09  [ main:0 ] - [ ERROR ]  org.postgresql.util.PSQLException: 错误: 函数 pg_logical_slot_peek(unknown, unknown, unknown) 不存在
+  建议：没有匹配指定名称和参数类型的函数. 您也许需要增加明确的类型转换.
+  位置：16
+2021-08-26 11:36:32  [ main:0 ] - [ ERROR ]  org.postgresql.util.PSQLException: 查询结果指标位置不正确，您也许需要呼叫 ResultSet 的 next() 方法。
+2021-08-26 11:37:40  [ main:0 ] - [ ERROR ]  org.postgresql.util.PSQLException: 查询结果指标位置不正确，您也许需要呼叫 ResultSet 的 next() 方法。
+2021-08-26 11:43:17  [ main:0 ] - [ DEBUG ]  BEGIN 589
+2021-08-26 11:43:17  [ main:1 ] - [ DEBUG ]  COMMIT 589
+2021-08-26 11:43:17  [ main:1 ] - [ DEBUG ]  BEGIN 590
+2021-08-26 11:43:17  [ main:1 ] - [ DEBUG ]  COMMIT 590
+2021-08-26 11:43:17  [ main:1 ] - [ DEBUG ]  BEGIN 591
+2021-08-26 11:43:17  [ main:1 ] - [ DEBUG ]  table public.users: INSERT: id[integer]:100 name[text]:'Vonng'
+2021-08-26 11:43:17  [ main:1 ] - [ DEBUG ]  COMMIT 591
+2021-08-26 11:43:17  [ main:1 ] - [ DEBUG ]  BEGIN 592
+2021-08-26 11:43:17  [ main:2 ] - [ DEBUG ]  table public.users: INSERT: id[integer]:101 name[text]:'Xiao Wang'
+2021-08-26 11:43:17  [ main:2 ] - [ DEBUG ]  COMMIT 592
+2021-08-26 11:43:17  [ main:2 ] - [ DEBUG ]  BEGIN 593
+2021-08-26 11:43:17  [ main:2 ] - [ DEBUG ]  table public.users: DELETE: id[integer]:100
+2021-08-26 11:43:17  [ main:2 ] - [ DEBUG ]  COMMIT 593
+2021-08-26 11:43:17  [ main:2 ] - [ DEBUG ]  BEGIN 594
+2021-08-26 11:43:17  [ main:2 ] - [ DEBUG ]  table public.users: UPDATE: id[integer]:101 name[text]:'Lao Wang'
+2021-08-26 11:43:17  [ main:2 ] - [ DEBUG ]  COMMIT 594
+2021-08-26 11:43:17  [ main:2 ] - [ DEBUG ]  BEGIN 595
+2021-08-26 11:43:17  [ main:2 ] - [ DEBUG ]  COMMIT 595
+2021-08-26 17:19:14  [ main:11 ] - [ ERROR ]  org.postgresql.util.PSQLException: ERROR: syntax error at or near "Vonng"
+  位置：34
+2021-08-26 17:19:14  [ main:34 ] - [ ERROR ]  org.postgresql.util.PSQLException: ERROR: syntax error at or near "Vonng"
+  位置：34
+2021-08-26 17:19:14  [ main:37 ] - [ ERROR ]  org.postgresql.util.PSQLException: ERROR: syntax error at or near "Xiao"
+  位置：34
