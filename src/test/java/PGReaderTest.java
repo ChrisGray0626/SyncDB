@@ -9,6 +9,6 @@ public class PGReaderTest {
         SyncData syncData = new SyncData();
         PostgreSQLReader postgreSQLReader = new PostgreSQLReader();
         postgreSQLReader.connect();
-        postgreSQLReader.readLogicalSlot(syncData);
+//        postgreSQLReader.readLogicalSlot(syncData);
     }
 }

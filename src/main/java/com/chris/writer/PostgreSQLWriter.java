@@ -76,8 +76,6 @@ public class PostgreSQLWriter extends AbstractWriter {
                 }
 
                 for (String SQL: SQLs) {
-                    logger.debug(SQL);
-                    logger.error(SQL);
                     try {
                         statement.execute(SQL);
                     } catch (SQLException e) {

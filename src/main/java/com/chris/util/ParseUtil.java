@@ -16,6 +16,47 @@ public class ParseUtil {
 
     private static final Logger logger = Logger.getLogger(PostgreSQLWriter.class);
 
+    public static void parseSQLServerCDC(ResultSet resultSet, SyncData syncData) {
+        List<List<String>> rowsData = new ArrayList<>();
+        String[] fieldsName = syncData.getFieldsName();
+        try {
+            while (resultSet.next()) {
+                List<String> list = new ArrayList<>();
+
+                for (String fieldName: fieldsName) {
+                    list.add(resultSet.getString(fieldName));
+                }
+
+                rowsData.add(list);
+                syncData.setEventType(getSQLServerEventType(resultSet.getString("__$operation")));
+                syncData.setRowsData(rowsData);
+            }
+        } catch (SQLException e) {
+            logger.error(e);
+        }
+    }
+
+    private static SyncData.EventTypeEnum getSQLServerEventType(String __$operation) {
+        SyncData.EventTypeEnum eventType = null;
+        switch (__$operation) {
+            case "1":
+                eventType = SyncData.EventTypeEnum.DELETE;
+                break;
+            case "2":
+                eventType = SyncData.EventTypeEnum.INSERT;
+                break;
+            case "3":
+                eventType = SyncData.EventTypeEnum.UPDATE;
+                break;
+            case "4":
+                eventType = SyncData.EventTypeEnum.UPDATE;
+                break;
+            default:
+                break;
+        }
+        return eventType;
+    }
+
     public static void parsePGLogicalSlot(ResultSet resultSet, SyncData syncData) {
         List<List<String>> rowsData = new ArrayList<>();
         try {

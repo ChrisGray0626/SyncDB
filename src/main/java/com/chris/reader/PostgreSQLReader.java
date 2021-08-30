@@ -60,7 +60,6 @@ public class PostgreSQLReader extends AbstractReader{
 
     @Override
     public void read() {
-        // TODO 轮询改监听
         while (true) {
             readLogicalSlot(syncData);
             try {
@@ -93,6 +92,10 @@ public class PostgreSQLReader extends AbstractReader{
 
     @Override
     public void close() {
-
+        try {
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -4,7 +4,6 @@ import com.chris.syncData.SyncData;
 
 public abstract class AbstractReader {
 
-    // TODO 库表筛选
     // 配置数据库信息
     public abstract void config(String fileName);
     // 初始化同步数据集
