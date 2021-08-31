@@ -10,20 +10,13 @@ import java.util.*;
 
 public class SyncData {
     private EventTypeEnum eventType;
-    private ReaderTypeEnum readerType;
     private WriterTypeEnum writerType;
-    private String databaseName;
-    private String tableName;
+    private ReaderTypeEnum readerType;
     private String[] fieldsName;
+    // TODO 数据格式修正
     private List<List<String>> rowsData;
-    private HashSet<String> targetTables;
     private SyncDataListener syncDataListener;
-    private Logger logger = Logger.getLogger(SyncData.class);
-
-    public SyncData(String databaseName, String tableName) {
-        this.databaseName = databaseName;
-        this.tableName = tableName;
-    }
+    private final Logger logger = Logger.getLogger(SyncData.class);
 
     public SyncData(){};
 
@@ -34,18 +27,15 @@ public class SyncData {
         } catch (IOException e) {
             logger.error(e);
         }
-        tableName = properties.getProperty("SyncData.tableName");
+
+        writerType = WriterTypeEnum.valueOf(properties.getProperty("writer.writerType"));
+        readerType = ReaderTypeEnum.valueOf(properties.getProperty("reader.readerType"));
         fieldsName = properties.getProperty("SyncData.fieldsName").replace(" ", "").split(",");
     }
 
     public void setRowsData(List<List<String>> rowsData) {
         this.rowsData = rowsData;
         syncDataListener.doSet(new SyncDataEvent(this));
-    }
-
-    // TODO 库表筛选
-    public boolean isTargetTable (String tableName) {
-        return targetTables.contains(tableName);
     }
 
     public void registerListener(SyncDataListener syncDataListener) {
@@ -58,7 +48,6 @@ public class SyncData {
 
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("tableName: ").append(tableName).append("\n");
         stringBuilder.append("rows: [\n");
         for (List<String> rows: rowsData) {
             stringBuilder.append("[");
@@ -78,22 +67,6 @@ public class SyncData {
         DELETE
     }
 
-    public void setDatabaseName(String databaseName) {
-        this.databaseName = databaseName;
-    }
-
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
-    }
-
-    public void setFieldsName(String[] fieldsName) {
-        this.fieldsName = fieldsName;
-    }
-
-    public void setTargetTables(HashSet<String> targetTables) {
-        this.targetTables = targetTables;
-    }
-
     public void setEventType(EventTypeEnum curEventTypeEnum) {
         this.eventType = curEventTypeEnum;
     }
@@ -104,14 +77,6 @@ public class SyncData {
 
     public void setWriterType(WriterTypeEnum writerTypeEnum) {
         this.writerType = writerTypeEnum;
-    }
-
-    public String getDatabaseName() {
-        return databaseName;
-    }
-
-    public String getTableName() {
-        return tableName;
     }
 
     public String[] getFieldsName() {
@@ -126,12 +91,12 @@ public class SyncData {
         return eventType;
     }
 
-    public ReaderTypeEnum getReaderType() {
-        return readerType;
+    public String getWriterType() {
+        return writerType.toString();
     }
 
-    public WriterTypeEnum getWriterType() {
-        return writerType;
+    public String getReaderType() {
+        return readerType.toString();
     }
 }
 

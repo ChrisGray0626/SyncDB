@@ -15,16 +15,18 @@ import java.util.List;
 import java.util.Properties;
 
 public class PostgreSQLWriter extends AbstractWriter {
-    public WriterTypeEnum writerType = WriterTypeEnum.POSTGRESQL;
+    public WriterTypeEnum writerType;
     private SyncData syncData;
     private String url;
     private String username;
     private String password;
+    private String tableName;
     private Connection connection;
     private Statement statement;
     private static final Logger logger = Logger.getLogger(PostgreSQLWriter.class);
 
     public PostgreSQLWriter() {
+        writerType = WriterTypeEnum.POSTGRESQL;
     }
 
     @Override
@@ -35,12 +37,15 @@ public class PostgreSQLWriter extends AbstractWriter {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        username = properties.getProperty("writer.username");
+        String databaseName = properties.getProperty("writer.databaseName");
+        password = properties.getProperty("writer.password");
+        tableName = properties.getProperty("writer.tableName");
         String hostname = properties.getProperty("writer.hostname");
         String port = properties.getProperty("writer.port");
-        String databaseName = properties.getProperty("writer.databaseName");
         url = "jdbc:postgresql://" + hostname + ":" + port + "/" + databaseName;
-        username = properties.getProperty("writer.username");
-        password = properties.getProperty("writer.password");
+
     }
 
     @Override
@@ -66,17 +71,17 @@ public class PostgreSQLWriter extends AbstractWriter {
             @Override
             public void doSet(SyncDataEvent event) {
                 logger.debug(syncData.toString());
-                String tableName = syncData.getTableName();
                 List<List<String>> rowsData = syncData.getRowsData();
                 SyncData.EventTypeEnum curEventTypeEnum = syncData.getEventType();
                 List<String> SQLs = new ArrayList<>();
 
                 if (curEventTypeEnum == SyncData.EventTypeEnum.INSERT) {
-                    SQLs = insertSQL(tableName, rowsData);
+                    SQLs = insertSQL(rowsData);
                 }
 
                 for (String SQL: SQLs) {
                     try {
+                        System.out.println(SQL);
                         statement.execute(SQL);
                     } catch (SQLException e) {
                         logger.error(e);
@@ -86,7 +91,7 @@ public class PostgreSQLWriter extends AbstractWriter {
         });
     }
 
-    private List<String> insertSQL(String tableName, List<List<String>> rowsData) {
+    private List<String> insertSQL(List<List<String>> rowsData) {
         List<String> SQLs = new ArrayList<>();
 
         for (List<String> rows : rowsData) {
