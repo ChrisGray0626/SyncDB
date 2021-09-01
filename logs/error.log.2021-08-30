@@ -1,0 +1,38 @@
+2021-08-30 14:39:50  [ main:0 ] - [ ERROR ]  java.lang.ClassNotFoundException: org.sqlserver.Driver
+2021-08-30 15:02:35  [ main:0 ] - [ ERROR ]  com.microsoft.sqlserver.jdbc.SQLServerException: The port number 1433/test is not valid.
+2021-08-30 15:02:35  [ main:1 ] - [ ERROR ]  java.lang.NullPointerException
+2021-08-30 15:03:33  [ main:0 ] - [ ERROR ]  com.microsoft.sqlserver.jdbc.SQLServerException: The connection string contains a badly formed name or value.
+2021-08-30 15:03:33  [ main:1 ] - [ ERROR ]  java.lang.NullPointerException
+2021-08-30 15:04:33  [ main:0 ] - [ ERROR ]  com.microsoft.sqlserver.jdbc.SQLServerException: The driver could not establish a secure connection to SQL Server by using Secure Sockets Layer (SSL) encryption. Error: "The server selected protocol version TLS10 is not accepted by client preferences [TLS12]". ClientConnectionId:26345bea-f4c7-4211-a68c-74da40650aa7
+2021-08-30 15:04:33  [ main:1 ] - [ ERROR ]  java.lang.NullPointerException
+2021-08-30 15:09:33  [ main:300017 ] - [ ERROR ]  java.lang.NullPointerException
+2021-08-30 15:11:57  [ main:0 ] - [ ERROR ]  com.microsoft.sqlserver.jdbc.SQLServerException: 无法打开登录所请求的数据库 "test"。登录失败。 ClientConnectionId:1613f74f-a03f-4450-b0a7-aadf50f5e69f
+2021-08-30 15:11:57  [ main:1 ] - [ ERROR ]  java.lang.NullPointerException
+2021-08-30 15:12:23  [ main:0 ] - [ ERROR ]  com.microsoft.sqlserver.jdbc.SQLServerException: 无法打开登录所请求的数据库 "test"。登录失败。 ClientConnectionId:7993d63a-93a3-4906-b5a4-338b600c97e8
+2021-08-30 15:12:23  [ main:0 ] - [ ERROR ]  java.lang.NullPointerException
+2021-08-30 15:12:38  [ main:0 ] - [ ERROR ]  com.microsoft.sqlserver.jdbc.SQLServerException: 无法打开登录所请求的数据库 "test"。登录失败。 ClientConnectionId:3d51dfe2-c871-4a2c-96ed-47d39b192d29
+2021-08-30 15:12:38  [ main:1 ] - [ ERROR ]  java.lang.NullPointerException
+2021-08-30 15:15:34  [ main:0 ] - [ ERROR ]  com.microsoft.sqlserver.jdbc.SQLServerException: 拒绝了对对象 'dbo_test_CT' (数据库 'test'，架构 'cdc')的 SELECT 权限。
+2021-08-30 15:16:24  [ main:0 ] - [ ERROR ]  com.microsoft.sqlserver.jdbc.SQLServerException: 拒绝了对对象 'dbo_test_CT' (数据库 'test'，架构 'cdc')的 SELECT 权限。
+2021-08-30 15:16:59  [ main:0 ] - [ ERROR ]  com.microsoft.sqlserver.jdbc.SQLServerException: 拒绝了对对象 'dbo_test_CT' (数据库 'test'，架构 'cdc')的 SELECT 权限。
+2021-08-30 15:17:42  [ main:0 ] - [ ERROR ]  com.microsoft.sqlserver.jdbc.SQLServerException: 拒绝了对对象 'dbo_test_CT' (数据库 'test'，架构 'cdc')的 SELECT 权限。
+2021-08-30 15:19:02  [ main:0 ] - [ ERROR ]  com.microsoft.sqlserver.jdbc.SQLServerException: 拒绝了对对象 'dbo_test_CT' (数据库 'test'，架构 'cdc')的 SELECT 权限。
+2021-08-30 15:20:20  [ main:0 ] - [ ERROR ]  com.microsoft.sqlserver.jdbc.SQLServerException: The column name data is not valid.
+2021-08-30 15:21:42  [ main:0 ] - [ ERROR ]  com.microsoft.sqlserver.jdbc.SQLServerException: The column name data is not valid.
+2021-08-30 16:10:20  [ main:0 ] - [ ERROR ]  INSERT INTO null VALUES('7         ','Mars      ')
+2021-08-30 16:10:20  [ main:12 ] - [ ERROR ]  org.postgresql.util.PSQLException: ERROR: syntax error at or near "null"
+  位置：13
+2021-08-30 16:15:20  [ main:300014 ] - [ ERROR ]  INSERT INTO null VALUES('7         ','Mars      ')
+2021-08-30 16:15:20  [ main:300017 ] - [ ERROR ]  org.postgresql.util.PSQLException: ERROR: syntax error at or near "null"
+  位置：13
+2021-08-30 16:20:20  [ main:600022 ] - [ ERROR ]  INSERT INTO null VALUES('7         ','Mars      ')
+2021-08-30 16:20:20  [ main:600025 ] - [ ERROR ]  org.postgresql.util.PSQLException: ERROR: syntax error at or near "null"
+  位置：13
+2021-08-30 16:25:20  [ main:900042 ] - [ ERROR ]  INSERT INTO null VALUES('7         ','Mars      ')
+2021-08-30 16:25:20  [ main:900046 ] - [ ERROR ]  org.postgresql.util.PSQLException: ERROR: syntax error at or near "null"
+  位置：13
+2021-08-30 16:29:34  [ main:0 ] - [ ERROR ]  com.microsoft.sqlserver.jdbc.SQLServerException: 对象名 'cdc.dbo_null_CT' 无效。
+2021-08-30 16:31:27  [ main:0 ] - [ ERROR ]  com.microsoft.sqlserver.jdbc.SQLServerException: 对象名 'cdc.dbo_null_CT' 无效。
+2021-08-30 16:32:08  [ main:0 ] - [ ERROR ]  com.microsoft.sqlserver.jdbc.SQLServerException: 对象名 'cdc.dbo_null_CT' 无效。
+2021-08-30 16:32:44  [ main:0 ] - [ ERROR ]  INSERT INTO users VALUES('1','Dancy')
+2021-08-30 17:28:53  [ main:0 ] - [ ERROR ]  com.microsoft.sqlserver.jdbc.SQLServerException: 必须声明标量变量 "@bglsn"。

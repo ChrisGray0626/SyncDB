@@ -1,10 +1,6 @@
-package com.chris;
-
 import com.chris.reader.MySQLReader;
 import com.chris.syncData.SyncData;
-import com.chris.syncData.SyncDataEvent;
 import com.chris.writer.PostgreSQLWriter;
-import com.chris.writer.WriterTypeEnum;
 import org.apache.log4j.Logger;
 
 
@@ -24,7 +20,7 @@ public class DBSync01 {
         postgreSQLWriter.write();
 
         mySQLReader.config(configFileName);
-        mySQLReader.init(syncData);
+        mySQLReader.initSyncData(syncData);
         mySQLReader.connect();
         mySQLReader.read();
     }

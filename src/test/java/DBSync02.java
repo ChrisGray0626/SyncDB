@@ -1,5 +1,3 @@
-package com.chris;
-
 import com.chris.reader.PostgreSQLReader;
 import com.chris.syncData.SyncData;
 import com.chris.writer.PostgreSQLWriter;
@@ -21,7 +19,7 @@ public class DBSync02 {
         postgreSQLWriter.write();
 
         postgreSQLReader.config(configFileName);
-        postgreSQLReader.init(syncData);
+        postgreSQLReader.initSyncData(syncData);
         postgreSQLReader.connect();
         while (true) {
             postgreSQLReader.read();

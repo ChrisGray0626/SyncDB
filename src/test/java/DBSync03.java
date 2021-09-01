@@ -1,5 +1,3 @@
-package com.chris;
-
 import com.chris.reader.SQLSeverReader;
 import com.chris.syncData.SyncData;
 import com.chris.writer.PostgreSQLWriter;
@@ -23,7 +21,7 @@ public class DBSync03 {
         postgreSQLWriter.write();
 
         sqlSeverReader.config(configFileName);
-        sqlSeverReader.init(syncData);
+        sqlSeverReader.initSyncData(syncData);
         sqlSeverReader.connect();
         sqlSeverReader.read();
 
