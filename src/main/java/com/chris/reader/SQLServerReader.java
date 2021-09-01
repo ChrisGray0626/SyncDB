@@ -10,7 +10,7 @@ import java.sql.*;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
-public class SQLSeverReader extends AbstractReader {
+public class SQLServerReader extends AbstractReader {
 
     public ReaderTypeEnum readerType;
     private SyncData syncData;
@@ -20,9 +20,9 @@ public class SQLSeverReader extends AbstractReader {
     private String tableName;
     private Connection connection;
     private Statement statement;
-    private static final Logger logger = Logger.getLogger(SQLSeverReader.class);
+    private static final Logger logger = Logger.getLogger(SQLServerReader.class);
 
-    public SQLSeverReader() {
+    public SQLServerReader() {
         readerType = ReaderTypeEnum.SQLSERVER;
     }
 

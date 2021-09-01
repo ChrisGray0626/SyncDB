@@ -91,12 +91,12 @@ public class SyncData {
         return eventType;
     }
 
-    public String getWriterType() {
-        return writerType.toString();
+    public WriterTypeEnum getWriterType() {
+        return writerType;
     }
 
-    public String getReaderType() {
-        return readerType.toString();
+    public ReaderTypeEnum getReaderType() {
+        return readerType;
     }
 }
 

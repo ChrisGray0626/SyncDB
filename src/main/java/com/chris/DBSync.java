@@ -6,7 +6,6 @@ import com.chris.util.ClassPathUtil;
 import com.chris.writer.AbstractWriter;
 import org.apache.log4j.Logger;
 
-import java.util.Objects;
 
 public class DBSync {
 
@@ -14,16 +13,15 @@ public class DBSync {
 
     public static void main(String[] args) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
         String configFileName = "resources/conf01.properties";
-
         SyncData syncData = new SyncData();
         syncData.config(configFileName);
 
-        // TODO 类加载名称问题
-        String writerClassPath = ClassPathUtil.getClassPath(AbstractWriter.class.getPackage().getName(), syncData.getWriterType());
+        // 动态加载Writer、Reader
+        String writerClassPath = ClassPathUtil.getWriterClassPath(syncData.getWriterType());
         Class<? extends AbstractWriter> writerClazz = (Class<? extends AbstractWriter>) Class.forName(writerClassPath);
         AbstractWriter writer = writerClazz.newInstance();
 
-        String readerClassPath = ClassPathUtil.getClassPath(AbstractReader.class.getPackage().getName(), syncData.getReaderType());
+        String readerClassPath = ClassPathUtil.getReaderClassPath(syncData.getReaderType());
         Class<? extends AbstractReader> readerClazz = (Class<? extends AbstractReader>) Class.forName(readerClassPath);
         AbstractReader reader = readerClazz.newInstance();
 

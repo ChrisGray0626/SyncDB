@@ -1,4 +1,4 @@
-# `SyncDB
+# SyncDB
 
 ## Reader
 
