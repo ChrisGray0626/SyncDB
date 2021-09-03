@@ -1,6 +1,7 @@
 package com.chris.reader;
 
 import com.chris.syncData.SyncData;
+import com.chris.util.FieldsNameUtil;
 import com.chris.util.ParseUtil;
 import com.chris.writer.PostgreSQLWriter;
 import org.apache.log4j.Logger;
@@ -18,6 +19,7 @@ public class PostgreSQLReader extends AbstractReader {
     private String username;
     private String password;
     private String tableName;
+    private String[] fieldsName;
     private Connection connection;
     private Statement statement;
     private String logicalReplicationSlotName;
@@ -27,12 +29,6 @@ public class PostgreSQLReader extends AbstractReader {
         readerType = ReaderTypeEnum.POSTGRESQL;
         // 默认逻辑复制插槽名称
         logicalReplicationSlotName = "test_slot";
-    }
-
-    @Override
-    public void initSyncData(SyncData syncData) {
-        this.syncData = syncData;
-        syncData.setReaderType(readerType);
     }
 
     @Override
@@ -53,6 +49,11 @@ public class PostgreSQLReader extends AbstractReader {
     }
 
     @Override
+    public void setSyncData(SyncData syncData) {
+        this.syncData = syncData;
+    }
+
+    @Override
     public void connect() {
         try {
             Class.forName("org.postgresql.Driver");
@@ -63,21 +64,20 @@ public class PostgreSQLReader extends AbstractReader {
         }
     }
 
-    @Override
-    public void read() {
-        // 默认五分钟轮询
-        read(5);
-    }
-
-    public void read(Integer delayTime) {
+    public void read(Integer interval) {
         while (true) {
             readLogicalSlot(syncData);
             try {
-                TimeUnit.MINUTES.sleep(delayTime);
+                TimeUnit.MINUTES.sleep(interval);
             } catch (InterruptedException e) {
                 logger.error(e);
             }
         }
+    }
+
+    public void read() {
+        // 默认五分钟轮询
+        read(5);
     }
 
     // 读取逻辑复制插槽
@@ -89,6 +89,11 @@ public class PostgreSQLReader extends AbstractReader {
         } catch (SQLException e) {
             logger.error(e);
         }
+    }
+
+    @Override
+    public void setFieldsName() {
+        fieldsName = FieldsNameUtil.getFieldsName(connection, tableName);
     }
 
     @Override

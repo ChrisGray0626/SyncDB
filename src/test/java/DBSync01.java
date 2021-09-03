@@ -15,12 +15,12 @@ public class DBSync01 {
         MySQLReader mySQLReader = new MySQLReader();
 
         postgreSQLWriter.config(configFileName);
-        postgreSQLWriter.init(syncData);
+        postgreSQLWriter.setSyncData(syncData);
         postgreSQLWriter.connect();
         postgreSQLWriter.write();
 
         mySQLReader.config(configFileName);
-        mySQLReader.initSyncData(syncData);
+        mySQLReader.setSyncData(syncData);
         mySQLReader.connect();
         mySQLReader.read();
     }

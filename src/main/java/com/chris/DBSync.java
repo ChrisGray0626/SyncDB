@@ -26,14 +26,16 @@ public class DBSync {
         AbstractReader reader = readerClazz.newInstance();
 
         writer.config(configFileName);
-        writer.init(syncData);
+        writer.setSyncData(syncData);
         writer.connect();
+        writer.setFieldsName();
         writer.write();
 
         reader.config(configFileName);
-        reader.initSyncData(syncData);
+        reader.setSyncData(syncData);
         reader.connect();
-        reader.read();
+        reader.setFieldsName();
+        reader.read(syncData.getInterval());
 
     }
 }

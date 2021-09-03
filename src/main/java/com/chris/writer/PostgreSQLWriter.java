@@ -2,6 +2,7 @@ package com.chris.writer;
 
 import com.chris.syncData.SyncData;
 import com.chris.syncData.SyncDataEvent;
+import com.chris.util.FieldsNameUtil;
 import org.apache.log4j.Logger;
 
 import java.io.FileInputStream;
@@ -21,6 +22,7 @@ public class PostgreSQLWriter extends AbstractWriter {
     private String username;
     private String password;
     private String tableName;
+    private String[] fieldsName;
     private Connection connection;
     private Statement statement;
     private static final Logger logger = Logger.getLogger(PostgreSQLWriter.class);
@@ -48,9 +50,7 @@ public class PostgreSQLWriter extends AbstractWriter {
 
     }
 
-    @Override
-    public void init(SyncData syncData) {
-        syncData.setWriterType(writerType);
+    public void setSyncData(SyncData syncData) {
         this.syncData = syncData;
     }
 
@@ -71,40 +71,39 @@ public class PostgreSQLWriter extends AbstractWriter {
             @Override
             public void doSet(SyncDataEvent event) {
                 logger.debug(syncData.toString());
-                List<List<String>> rowsData = syncData.getRowsData();
+                List<String> rows = syncData.getRows();
                 SyncData.EventTypeEnum curEventTypeEnum = syncData.getEventType();
-                List<String> SQLs = new ArrayList<>();
 
+                String SQL = null;
                 if (curEventTypeEnum == SyncData.EventTypeEnum.INSERT) {
-                    SQLs = insertSQL(rowsData);
+                    SQL = insertSQL(rows);
                 }
 
-                for (String SQL: SQLs) {
-                    try {
-                        System.out.println(SQL);
-                        statement.execute(SQL);
-                    } catch (SQLException e) {
-                        logger.error(e);
-                    }
+                try {
+                    statement.execute(SQL);
+                    logger.debug(SQL);
+                } catch (SQLException e) {
+                    logger.error(e);
                 }
             }
         });
     }
 
-    private List<String> insertSQL(List<List<String>> rowsData) {
-        List<String> SQLs = new ArrayList<>();
+    private String insertSQL(List<String> rows) {
 
-        for (List<String> rows : rowsData) {
-            StringBuilder values = new StringBuilder();
+        StringBuilder values = new StringBuilder();
             for (String value : rows) {
                 values.append("'").append(value).append("',");
             }
             values.deleteCharAt(values.length() - 1);
 
             String SQL = "INSERT INTO " + tableName + " VALUES(" + values + ")";
-            SQLs.add(SQL);
-        }
-        return SQLs;
+        return SQL;
+    }
+
+    @Override
+    public void setFieldsName() {
+        fieldsName = FieldsNameUtil.getFieldsName(connection, tableName);
     }
 
     @Override

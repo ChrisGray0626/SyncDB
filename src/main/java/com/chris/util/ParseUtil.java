@@ -8,7 +8,9 @@ import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -78,14 +80,12 @@ public class ParseUtil {
                         while (matcher.find()) {
                             rows.add(matcher.group().replace("'", ""));
                         }
-                        rowsData.add(rows);
+                        syncData.setEventType(eventType);
+                        syncData.setRows(rows);
                         break;
                     default:
                         break;
                 }
-
-                syncData.setEventType(eventType);
-                syncData.setRowsData(rowsData);
             }
         } catch (SQLException e) {
             logger.error(e);
@@ -102,21 +102,19 @@ public class ParseUtil {
 
                 switch (curEventType) {
                     case INSERT:
-                        List<String> list = new ArrayList<>();
+                        List<String> rows = new ArrayList<>();
 
                         // 根据字段名称获取对应数据
                         for (String fieldName: fieldsName) {
-                            list.add(resultSet.getString(fieldName));
+                            rows.add(resultSet.getString(fieldName));
                         }
-                        rowsData.add(list);
+                        syncData.setEventType(INSERT);
+                        syncData.setRows(rows);
                         break;
                     default:
                         break;
                 }
             }
-
-            syncData.setEventType(INSERT);
-            syncData.setRowsData(rowsData);
         } catch (SQLException e) {
             logger.error(e);
         }
@@ -142,5 +140,17 @@ public class ParseUtil {
                 break;
         }
         return eventType;
+    }
+
+    // 解析字段映射关系
+    public static Map<String, String> parseFieldNameMap(String ss) {
+        Map<String, String> fieldNameMap = new HashMap<>();
+        String[] maps = ss.split(";");
+        for (String map: maps) {
+            String srcFieldName = map.split(":")[0];
+            String dstFieldName = map.split(":")[1];
+            fieldNameMap.put(srcFieldName, dstFieldName);
+        }
+        return fieldNameMap;
     }
 }

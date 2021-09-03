@@ -1,13 +1,19 @@
 package com.chris.reader;
 
 import com.chris.syncData.SyncData;
+import com.chris.util.FieldsNameUtil;
 import com.chris.util.ParseUtil;
+import com.chris.writer.PostgreSQLWriter;
 import com.github.shyiko.mysql.binlog.BinaryLogClient;
 import com.github.shyiko.mysql.binlog.event.*;
 import com.github.shyiko.mysql.binlog.event.deserialization.EventDeserializer;
+import org.apache.log4j.Logger;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.sql.*;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 
 public class MySQLReader extends AbstractReader {
@@ -16,11 +22,16 @@ public class MySQLReader extends AbstractReader {
     private SyncData syncData;
     private String hostname;
     private String port;
+    private String url;
     private String username;
     private String password;
     private String databaseName;
     private String tableName;
+    private String[] fieldsName;
+    private Connection connection;
+    private Statement statement;
     private BinaryLogClient client; // binlog监听客户端
+    private static final Logger logger = Logger.getLogger(MySQLReader.class);
 
     public MySQLReader() {
         readerType = ReaderTypeEnum.MYSQL;
@@ -34,8 +45,10 @@ public class MySQLReader extends AbstractReader {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        databaseName = properties.getProperty("reader.databaseName");
         hostname = properties.getProperty("reader.hostname");
         port = properties.getProperty("reader.port");
+        url = "jdbc:mysql://" + hostname + ":" + port + "/" + databaseName;
         username = properties.getProperty("reader.username");
         password = properties.getProperty("reader.password");
         databaseName = properties.getProperty("reader.databaseName");
@@ -43,13 +56,30 @@ public class MySQLReader extends AbstractReader {
     }
 
     @Override
-    public void initSyncData(SyncData syncData) {
+    public void setSyncData(SyncData syncData) {
         this.syncData = syncData;
-        syncData.setReaderType(readerType);
+    }
+
+    @Override
+    public void read(Integer interval) {
     }
 
     @Override
     public void read() {
+    }
+
+    // 另外新建一条连接获取字段名
+    @Override
+    public void setFieldsName() {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            connection = DriverManager.getConnection(url, username, password);
+            statement = connection.createStatement();
+            fieldsName = FieldsNameUtil.getFieldsName(connection, tableName);
+            connection.close();
+        } catch (ClassNotFoundException | SQLException e) {
+            logger.error(e);
+        }
     }
 
     // 监听客户端配置
@@ -86,9 +116,13 @@ public class MySQLReader extends AbstractReader {
                     if (databaseName.equals(curDataBaseName[0])
                     && tableName.equals(curTableName[0])) {
                         WriteRowsEventData writeRowsEventData = (WriteRowsEventData) eventData;
+                        List<List<String>> rowsData = ParseUtil.parseMySQLBinLogRows(writeRowsEventData.getRows());
 
                         syncData.setEventType(SyncData.EventTypeEnum.INSERT);
-                        syncData.setRowsData(ParseUtil.parseMySQLBinLogRows(writeRowsEventData.getRows()));
+                        for (List<String> rows: rowsData) {
+                            syncData.setRows(rows);
+                        }
+
                     }
                 }
             }
@@ -97,6 +131,8 @@ public class MySQLReader extends AbstractReader {
 
     @Override
     public void connect() {
+        // TODO 获取字段名位置问题
+        setFieldsName();
         clientConfig();
         try {
             client.connect();
@@ -107,8 +143,4 @@ public class MySQLReader extends AbstractReader {
 
     @Override
     public void close() {}
-
-    public void setSyncData(SyncData syncData) {
-        this.syncData = syncData;
-    }
 }

@@ -14,12 +14,12 @@ public class DBSync02 {
         PostgreSQLWriter postgreSQLWriter = new PostgreSQLWriter();
 
         postgreSQLWriter.config(configFileName);
-        postgreSQLWriter.init(syncData);
+        postgreSQLWriter.setSyncData(syncData);
         postgreSQLWriter.connect();
         postgreSQLWriter.write();
 
         postgreSQLReader.config(configFileName);
-        postgreSQLReader.initSyncData(syncData);
+        postgreSQLReader.setSyncData(syncData);
         postgreSQLReader.connect();
         while (true) {
             postgreSQLReader.read();

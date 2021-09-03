@@ -103,7 +103,7 @@
     ```sql
     SELECT * FROM cdc.dbo_tableName_CT
     
-    -- 查询最近delayTime时间（分钟）内的捕获数据
+    -- 查询间隔时间interval（分钟）内的捕获数据
     DECLARE @bglsn VARBINARY(10)=sys.fn_cdc_map_time_to_lsn('smallest greater than or equal',DATEADD(mi,-delayTime, GETDATE()));
     DECLARE @edlsn VARBINARY(10)=sys.fn_cdc_map_time_to_lsn('largest less than or equal',GETDATE());
     SELECT * FROM cdc.dbo_ + tableName + _CT WHERE [__$start_lsn] BETWEEN @bglsn AND @edlsn);
@@ -144,18 +144,26 @@
 
 ### 监听器（SyncDataListener）
 
-监听器建立在属性rowsData上，每次调用方法setRowsData后，将调用监听器的方法doSet。
+监听器建立在属性rows上，每次调用方法setRows后，将调用监听器的方法doSet。
 
 ### 数据格式
 
-List<List<String>>
+List<String> rows
+
+### 字段名映射
+
+HashMap<String, String> fieldsNameMap
 
 ## 配置文件
 
-文件位置：resources/conf.properties
+### 文件位置
+
+resources/conf.properties
+
+### 配置样例
 
 ```properties
-reader.readrType = 
+reader.readerType =
 reader.hostname =
 reader.port =
 reader.username =
@@ -163,7 +171,7 @@ reader.password =
 reader.databaseName =
 reader.tableName =
 
-writer.writerType = 
+writer.writerType =
 writer.hostname =
 writer.port =
 writer.username =
@@ -171,9 +179,25 @@ writer.password =
 writer.databaseName =
 writer.tableName =
 
-# 目标表的字段名称
+# 目标表的字段名
 SyncData.fieldsName = XX,XX
+# 字段映射关系
+SyncData.fieldNameMap = XX:XX;XX:XX
+# 数据库的时间间隔
+SyncData.interval = 
 ```
+
+### 配置规范
+
+#### readType名称
+
+- MYSQL
+- POSTGRESQL
+- SQLSERVER
+
+#### writerType名称
+
+- POSTGRESQL
 
 ## 注意事项
 

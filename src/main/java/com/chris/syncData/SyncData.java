@@ -1,6 +1,7 @@
 package com.chris.syncData;
 
 import com.chris.reader.ReaderTypeEnum;
+import com.chris.util.ParseUtil;
 import com.chris.writer.WriterTypeEnum;
 import org.apache.log4j.Logger;
 
@@ -13,8 +14,9 @@ public class SyncData {
     private WriterTypeEnum writerType;
     private ReaderTypeEnum readerType;
     private String[] fieldsName;
-    // TODO 数据格式修正
-    private List<List<String>> rowsData;
+    private Map<String, String> fieldNameMap;
+    private List<String> rows;
+    private Integer interval;
     private SyncDataListener syncDataListener;
     private final Logger logger = Logger.getLogger(SyncData.class);
 
@@ -28,13 +30,15 @@ public class SyncData {
             logger.error(e);
         }
 
-        writerType = WriterTypeEnum.valueOf(properties.getProperty("writer.writerType"));
-        readerType = ReaderTypeEnum.valueOf(properties.getProperty("reader.readerType"));
+        writerType = WriterTypeEnum.valueOf(properties.getProperty("writer.writerType").toUpperCase());
+        readerType = ReaderTypeEnum.valueOf(properties.getProperty("reader.readerType").toUpperCase());
         fieldsName = properties.getProperty("SyncData.fieldsName").replace(" ", "").split(",");
+        interval = Integer.parseInt(properties.getProperty("SyncData.interval"));
+        fieldNameMap = ParseUtil.parseFieldNameMap(properties.getProperty("SyncData.fieldNameMap"));
     }
 
-    public void setRowsData(List<List<String>> rowsData) {
-        this.rowsData = rowsData;
+    public void setRows(List<String> rows) {
+        this.rows = rows;
         syncDataListener.doSet(new SyncDataEvent(this));
     }
 
@@ -48,16 +52,12 @@ public class SyncData {
 
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("rows: [\n");
-        for (List<String> rows: rowsData) {
-            stringBuilder.append("[");
-            for (String row: rows) {
-                stringBuilder.append(row).append(",");
-            }
-            stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-            stringBuilder.append("]\n");
+        stringBuilder.append("rows: [");
+        for (String row: rows) {
+            stringBuilder.append(row).append(",");
         }
-        stringBuilder.append("]");
+            stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+            stringBuilder.append("]");
         return stringBuilder.toString();
     }
 
@@ -83,8 +83,8 @@ public class SyncData {
         return fieldsName;
     }
 
-    public List<List<String>> getRowsData() {
-        return rowsData;
+    public List<String> getRows() {
+        return rows;
     }
 
     public EventTypeEnum getEventType() {
@@ -97,6 +97,10 @@ public class SyncData {
 
     public ReaderTypeEnum getReaderType() {
         return readerType;
+    }
+
+    public Integer getInterval() {
+        return interval;
     }
 }
 

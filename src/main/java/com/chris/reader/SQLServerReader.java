@@ -1,12 +1,15 @@
 package com.chris.reader;
 
 import com.chris.syncData.SyncData;
+import com.chris.util.FieldsNameUtil;
 import com.chris.util.ParseUtil;
 import org.apache.log4j.Logger;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
@@ -18,18 +21,13 @@ public class SQLServerReader extends AbstractReader {
     private String username;
     private String password;
     private String tableName;
+    private String[] fieldsName;
     private Connection connection;
     private Statement statement;
     private static final Logger logger = Logger.getLogger(SQLServerReader.class);
 
     public SQLServerReader() {
         readerType = ReaderTypeEnum.SQLSERVER;
-    }
-
-    @Override
-    public void initSyncData(SyncData syncData) {
-        this.syncData = syncData;
-        syncData.setReaderType(readerType);
     }
 
     @Override
@@ -50,6 +48,11 @@ public class SQLServerReader extends AbstractReader {
     }
 
     @Override
+    public void setSyncData(SyncData syncData) {
+        this.syncData = syncData;
+    }
+
+    @Override
     public void connect() {
         try {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
@@ -61,20 +64,26 @@ public class SQLServerReader extends AbstractReader {
     }
 
     @Override
+    public void read(Integer interval) {
+        while (true) {
+            readCDCTable(syncData, interval);
+            try {
+                TimeUnit.MINUTES.sleep(interval);
+            } catch (InterruptedException e) {
+                logger.error(e);
+            }
+        }
+    }
+
+    @Override
     public void read() {
         // 默认五分钟轮询
         read(5);
     }
 
-    public void read(Integer delayTime) {
-        while (true) {
-            readCDCTable(syncData, delayTime);
-            try {
-                TimeUnit.MINUTES.sleep(delayTime);
-            } catch (InterruptedException e) {
-                logger.error(e);
-            }
-        }
+    @Override
+    public void setFieldsName() {
+        fieldsName = FieldsNameUtil.getFieldsName(connection, tableName);
     }
 
     // 读取指定表的CDC表
