@@ -1,5 +1,6 @@
 package com.chris.reader;
 
+import com.chris.config.ReaderConfig;
 import com.chris.syncData.SyncData;
 import com.chris.util.FieldsNameUtil;
 import com.chris.util.ParseUtil;
@@ -8,8 +9,6 @@ import org.apache.log4j.Logger;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
@@ -18,7 +17,7 @@ public class SQLServerReader extends AbstractReader {
     public ReaderTypeEnum readerType;
     private SyncData syncData;
     private String url;
-    private String username;
+    private String user;
     private String password;
     private String tableName;
     private String[] fieldsName;
@@ -30,6 +29,7 @@ public class SQLServerReader extends AbstractReader {
         readerType = ReaderTypeEnum.SQLSERVER;
     }
 
+    // TODO
     @Override
     public void config(String fileName) {
         Properties properties = new Properties();
@@ -42,7 +42,7 @@ public class SQLServerReader extends AbstractReader {
         String port = properties.getProperty("reader.port");
         String databaseName = properties.getProperty("reader.databaseName");
         url = "jdbc:sqlserver://" + hostname + ":" + port + ";DatabaseName=" + databaseName;
-        username = properties.getProperty("reader.username");
+        user = properties.getProperty("reader.username");
         password = properties.getProperty("reader.password");
         tableName = properties.getProperty("reader.tableName");
     }
@@ -53,17 +53,21 @@ public class SQLServerReader extends AbstractReader {
     }
 
     @Override
+    public void setReaderConfig(ReaderConfig readerConfig) {
+
+    }
+
+    @Override
     public void connect() {
         try {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            connection = DriverManager.getConnection(url, username, password);
+            connection = DriverManager.getConnection(url, user, password);
             statement = connection.createStatement();
         } catch (ClassNotFoundException | SQLException e) {
             logger.error(e);
         }
     }
 
-    @Override
     public void read(Integer interval) {
         while (true) {
             readCDCTable(syncData, interval);
@@ -81,7 +85,6 @@ public class SQLServerReader extends AbstractReader {
         read(5);
     }
 
-    @Override
     public void setFieldsName() {
         fieldsName = FieldsNameUtil.getFieldsName(connection, tableName);
     }

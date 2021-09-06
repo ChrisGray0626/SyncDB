@@ -81,7 +81,7 @@ public class ParseUtil {
                             rows.add(matcher.group().replace("'", ""));
                         }
                         syncData.setEventType(eventType);
-                        syncData.setRows(rows);
+                        syncData.setRows(rows.toArray(new String[0]));
                         break;
                     default:
                         break;
@@ -109,7 +109,7 @@ public class ParseUtil {
                             rows.add(resultSet.getString(fieldName));
                         }
                         syncData.setEventType(INSERT);
-                        syncData.setRows(rows);
+                        syncData.setRows(rows.toArray(new String[0]));
                         break;
                     default:
                         break;

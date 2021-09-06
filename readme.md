@@ -154,52 +154,70 @@ List<String> rows
 
 HashMap<String, String> fieldsNameMap
 
-## 配置文件
+## 配置信息（Config）
 
-### 文件位置
+配置信息的具体内容存储至数据库中。
+
+### 配置连接（MySQL）
+
+#### 文件位置
 
 resources/conf.properties
 
-### 配置样例
+#### 配置信息
 
-```properties
-reader.readerType =
-reader.hostname =
-reader.port =
-reader.username =
-reader.password =
-reader.databaseName =
-reader.tableName =
-
-writer.writerType =
-writer.hostname =
-writer.port =
-writer.username =
-writer.password =
-writer.databaseName =
-writer.tableName =
-
-# 目标表的字段名
-SyncData.fieldsName = XX,XX
-# 字段映射关系
-SyncData.fieldNameMap = XX:XX;XX:XX
-# 数据库的时间间隔
-SyncData.interval = 
+```sql
+config.hostname = localhost
+config.port = 3306
+config.databaseName = test
+config.user = root
+config.password = 123456
+config.tableName = db_sync_config
 ```
+
+### 配置获取
+
+
 
 ### 配置规范
 
-#### readType名称
+#### readType
 
 - MYSQL
 - POSTGRESQL
 - SQLSERVER
 
-#### writerType名称
+#### writerType
 
 - POSTGRESQL
+
+## 日志（Log）
+
+### 存储方式（MySQL）
+
+```sql
+create table log(
+	id int(4) PRIMARY KEY AUTO_INCREMENT,
+	create_time datetime,
+	logs VARCHAR(255)
+)
+```
+
+### log4j配置
+
+```properties
+log4j.appender.Database=org.apache.log4j.jdbc.JDBCAppender
+log4j.appender.Database.driver=com.mysql.cj.jdbc.Driver
+log4j.appender.Database.URL=jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=UTF-8
+log4j.appender.Database.user=root
+log4j.appender.Database.password=123456
+log4j.appender.Database.sql=insert into log (create_time, log) VALUES ("%d{yyyy-MM-dd hh:mm:ss}", "%c %m%n")
+log4j.appender.Database.Threshold = ERROR
+log4j.appender.Database.layout=org.apache.log4j.PatternLayout
+```
 
 ## 注意事项
 
 - 当前Writer的初始化要求先于Reader，因为当前对于同步数据集SyncData的监听设置是在Writer的write()方法中完成的。
+- 抽象类Writer/Reader必须与实现类放在同一package下，否则无法动态加载实现类。
 
