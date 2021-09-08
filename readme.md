@@ -150,9 +150,9 @@
 
 List<String> rows
 
-### 字段名映射
+## 数据映射（Mapper）
 
-HashMap<String, String> fieldsNameMap
+## 数据过滤（Filter）
 
 ## 配置信息（Config）
 
@@ -167,12 +167,12 @@ resources/conf.properties
 #### 配置信息
 
 ```sql
-config.hostname = localhost
-config.port = 3306
-config.databaseName = test
-config.user = root
-config.password = 123456
-config.tableName = db_sync_config
+configuration.hostname = localhost
+configuration.port = 3306
+configuration.databaseName = test
+configuration.user = root
+configuration.password = 123456
+configuration.tableName = db_sync_config
 ```
 
 ### 配置获取
@@ -181,15 +181,11 @@ config.tableName = db_sync_config
 
 ### 配置规范
 
-#### readType
+#### DBType
 
 - MYSQL
 - POSTGRESQL
 - SQLSERVER
-
-#### writerType
-
-- POSTGRESQL
 
 ## 日志（Log）
 
@@ -218,6 +214,5 @@ log4j.appender.Database.layout=org.apache.log4j.PatternLayout
 
 ## 注意事项
 
-- 当前Writer的初始化要求先于Reader，因为当前对于同步数据集SyncData的监听设置是在Writer的write()方法中完成的。
 - 抽象类Writer/Reader必须与实现类放在同一package下，否则无法动态加载实现类。
 

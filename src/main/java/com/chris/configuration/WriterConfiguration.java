@@ -1,28 +1,28 @@
-package com.chris.config;
+package com.chris.configuration;
 
 
-import com.chris.writer.WriterTypeEnum;
+import common.DBTypeEnum;
 
-public class WriterConfig {
+public class WriterConfiguration {
 
-    public WriterTypeEnum writerType;
+    public DBTypeEnum dbType;
     private String hostname;
     private String port;
     private String user;
     private String password;
-    private String databaseName;
+    private String dbName;
     private String tableName;
 
     public String getUrl() {
-        return "jdbc:" + writerType.toString().toLowerCase() + "://" + hostname + ":" + port + "/" + databaseName;
+        return "jdbc:" + dbType.toString().toLowerCase() + "://" + hostname + ":" + port + "/" + dbName;
     }
 
-    public WriterTypeEnum getWriterType() {
-        return writerType;
+    public DBTypeEnum getDBType() {
+        return dbType;
     }
 
-    public void setWriterType(WriterTypeEnum writerType) {
-        this.writerType = writerType;
+    public void setDBType(DBTypeEnum dbType) {
+        this.dbType = dbType;
     }
 
     public String getHostname() {
@@ -57,12 +57,12 @@ public class WriterConfig {
         this.password = password;
     }
 
-    public String getDatabaseName() {
-        return databaseName;
+    public String getDBName() {
+        return dbName;
     }
 
-    public void setDatabaseName(String databaseName) {
-        this.databaseName = databaseName;
+    public void setDBName(String dbName) {
+        this.dbName = dbName;
     }
 
     public String getTableName() {

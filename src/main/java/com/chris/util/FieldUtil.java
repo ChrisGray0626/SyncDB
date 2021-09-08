@@ -9,11 +9,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FieldsNameUtil {
+public class FieldUtil {
 
-    private static final Logger logger = Logger.getLogger(FieldsNameUtil.class);
+    private static final Logger logger = Logger.getLogger(FieldUtil.class);
 
-    public static String[] getFieldsName(Connection connection, String tableName) {
+    public static String[] readFieldName(Connection connection, String tableName) {
         List<String> fieldsName = new ArrayList<>();
 
         try {

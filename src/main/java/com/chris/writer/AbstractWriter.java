@@ -1,22 +1,19 @@
 package com.chris.writer;
 
-import com.chris.config.WriterConfig;
+import com.chris.configuration.WriterConfiguration;
 import common.Task;
 import common.Writeable;
 
 
 public abstract class AbstractWriter extends Task implements Writeable {
 
-    public WriterTypeEnum writerType;
-    private WriterConfig writerConfig;
+    private WriterConfiguration writerConfiguration;
 
-    public abstract void config(String fileName);
-
-    public WriterConfig getWriterConfig() {
-        return writerConfig;
+    public WriterConfiguration getWriterConfig() {
+        return writerConfiguration;
     }
 
-    public void setWriterConfig(WriterConfig writerConfig) {
-        this.writerConfig = writerConfig;
+    public void setWriterConfig(WriterConfiguration writerConfiguration) {
+        this.writerConfiguration = writerConfiguration;
     }
 }

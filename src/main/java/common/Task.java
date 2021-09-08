@@ -5,8 +5,9 @@ import com.chris.syncData.SyncData;
 
 public abstract class Task {
 
-    public DBType dbType;
+    public DBTypeEnum dbType;
     private SyncData syncData;
+    private String[] fieldNames;
 
     public abstract void connect();
     public abstract void close();
@@ -17,5 +18,13 @@ public abstract class Task {
 
     public void setSyncData(SyncData syncData) {
         this.syncData = syncData;
+    }
+
+    public String[] getFieldNames() {
+        return fieldNames;
+    }
+
+    public void setFieldNames(String[] fieldNames) {
+        this.fieldNames = fieldNames;
     }
 }

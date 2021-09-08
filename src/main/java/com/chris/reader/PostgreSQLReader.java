@@ -2,40 +2,36 @@ package com.chris.reader;
 
 import com.chris.syncData.SyncData;
 import com.chris.util.ConnectUtil;
-import com.chris.util.FieldsNameUtil;
 import com.chris.util.ParseUtil;
-import com.chris.writer.PostgreSQLWriter;
-import common.DBType;
+import com.chris.writer.Writer;
+import common.DBTypeEnum;
+import com.chris.util.FieldUtil;
 import org.apache.log4j.Logger;
 
 import java.sql.*;
 import java.util.concurrent.TimeUnit;
 
 public class PostgreSQLReader extends AbstractReader {
-    private String[] fieldsName;
     private Connection connection;
-    private Statement statement;
     private String logicalReplicationSlotName;
-    private static final Logger logger = Logger.getLogger(PostgreSQLWriter.class);
+    private static final Logger logger = Logger.getLogger(Writer.class);
 
     public PostgreSQLReader() {
-        readerType = ReaderTypeEnum.POSTGRESQL;
+        dbType = DBTypeEnum.POSTGRESQL;
         // 默认逻辑复制插槽名称
         logicalReplicationSlotName = "test_slot";
     }
 
     @Override
-    public void config(String fileName) {
+    public void connect() {
+        connection = ConnectUtil.connect(dbType, getReaderConfig().getUrl(), getReaderConfig().getUser(), getReaderConfig().getPassword());
+        setFieldNames(FieldUtil.readFieldName(connection, getReaderConfig().getTableName()));
     }
 
     @Override
-    public void connect() {
-        connection = ConnectUtil.connect(DBType.POSTGRESQL, connection, super.getReaderConfig().getUrl(), super.getReaderConfig().getUser(), super.getReaderConfig().getPassword());
-    }
-
     public void read(Integer interval) {
         while (true) {
-            readLogicalSlot(super.getSyncData());
+            readLogicalSlot(getSyncData());
             try {
                 TimeUnit.MINUTES.sleep(interval);
             } catch (InterruptedException e) {
@@ -44,25 +40,22 @@ public class PostgreSQLReader extends AbstractReader {
         }
     }
 
-    // 默认轮询五分钟
+    // 默认轮询间隔1分钟
+    @Override
     public void read() {
-        read(5);
+        read(1);
     }
 
     // 读取逻辑复制插槽
     private void readLogicalSlot(SyncData syncData) {
         try {
-            statement = connection.createStatement();
+            Statement statement = connection.createStatement();
             // 查看并消费插槽数据
             ResultSet resultSet = statement.executeQuery("SELECT * FROM pg_logical_slot_get_changes('" + logicalReplicationSlotName + "', NULL, NULL)");
-            ParseUtil.parsePGLogicalSlot(resultSet, syncData, super.getReaderConfig().getTableName());
+            ParseUtil.parsePGLogicalSlot(resultSet, syncData, getReaderConfig().getTableName());
         } catch (SQLException e) {
             logger.error(e);
         }
-    }
-
-    public void setFieldsName() {
-        fieldsName = FieldsNameUtil.getFieldsName(connection, super.getReaderConfig().getTableName());
     }
 
     @Override

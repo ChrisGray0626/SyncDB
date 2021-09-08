@@ -1,6 +1,6 @@
 package common;
 
-public enum DBType {
+public enum DBTypeEnum {
 
     MYSQL,
     POSTGRESQL,

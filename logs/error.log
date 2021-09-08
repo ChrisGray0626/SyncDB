@@ -1,4 +1,7 @@
-2021-09-03 17:20:42  [ main:2 ] - [ ERROR ]  java.lang.ClassNotFoundException: org.mysql.Driver
-2021-09-03 17:24:08  [ main:1 ] - [ ERROR ]  java.lang.ClassNotFoundException: org.mysql.Driver
-2021-09-03 17:26:14  [ main:2433 ] - [ ERROR ]  java.sql.SQLSyntaxErrorException: Unknown database 'null'
-2021-09-03 17:27:39  [ main:1936 ] - [ ERROR ]  java.sql.SQLSyntaxErrorException: Unknown database 'null'
+2021-09-08 11:22:58  [ main:2 ] - [ ERROR ]  java.lang.NullPointerException
+2021-09-08 11:23:27  [ main:0 ] - [ ERROR ]  java.lang.NullPointerException
+2021-09-08 11:23:27  [ main:2 ] - [ ERROR ]  java.lang.NullPointerException
+2021-09-08 11:23:38  [ main:0 ] - [ ERROR ]  java.lang.NullPointerException
+2021-09-08 11:23:38  [ main:1 ] - [ ERROR ]  java.lang.NullPointerException
+2021-09-08 11:24:03  [ main:0 ] - [ ERROR ]  java.lang.NullPointerException
+2021-09-08 11:24:03  [ main:1 ] - [ ERROR ]  java.lang.NullPointerException

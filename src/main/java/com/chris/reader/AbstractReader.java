@@ -1,21 +1,18 @@
 package com.chris.reader;
 
-import com.chris.config.ReaderConfig;
+import com.chris.configuration.ReaderConfiguration;
 import common.Readable;
 import common.Task;
 
 public abstract class AbstractReader extends Task implements Readable {
 
-    public ReaderTypeEnum readerType;
-    private ReaderConfig readerConfig;
+    private ReaderConfiguration readerConfiguration;
 
-    public abstract void config(String fileName);
-
-    public ReaderConfig getReaderConfig() {
-        return readerConfig;
+    public ReaderConfiguration getReaderConfig() {
+        return readerConfiguration;
     }
 
-    public void setReaderConfig(ReaderConfig readerConfig) {
-        this.readerConfig = readerConfig;
+    public void setReaderConfig(ReaderConfiguration readerConfiguration) {
+        this.readerConfiguration = readerConfiguration;
     }
 }

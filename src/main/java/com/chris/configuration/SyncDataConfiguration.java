@@ -1,6 +1,6 @@
-package com.chris.config;
+package com.chris.configuration;
 
-public class SyncDataConfig {
+public class SyncDataConfiguration {
 
     private Integer interval;
 

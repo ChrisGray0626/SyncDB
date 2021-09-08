@@ -1,27 +1,27 @@
-package com.chris.config;
+package com.chris.configuration;
 
-import com.chris.reader.ReaderTypeEnum;
+import common.DBTypeEnum;
 
-public class ReaderConfig {
+public class ReaderConfiguration {
 
-    public ReaderTypeEnum readerType;
+    public DBTypeEnum dbType;
     private String hostname;
     private String port;
     private String user;
     private String password;
-    private String databaseName;
+    private String dbName;
     private String tableName;
 
     public String getUrl() {
-        return "jdbc:" + readerType.toString().toLowerCase() + "://" + hostname + ":" + port + "/" + databaseName;
+        return "jdbc:" + dbType.toString().toLowerCase() + "://" + hostname + ":" + port + "/" + dbName;
     }
 
-    public ReaderTypeEnum getReaderType() {
-        return readerType;
+    public DBTypeEnum getDBType() {
+        return dbType;
     }
 
-    public void setReaderType(ReaderTypeEnum readerType) {
-        this.readerType = readerType;
+    public void setDBType(DBTypeEnum dbType) {
+        this.dbType = dbType;
     }
 
     public String getHostname() {
@@ -56,12 +56,12 @@ public class ReaderConfig {
         this.password = password;
     }
 
-    public String getDatabaseName() {
-        return databaseName;
+    public String getDBName() {
+        return dbName;
     }
 
-    public void setDatabaseName(String databaseName) {
-        this.databaseName = databaseName;
+    public void setDBName(String dbName) {
+        this.dbName = dbName;
     }
 
     public String getTableName() {

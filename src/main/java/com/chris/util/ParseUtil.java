@@ -1,7 +1,7 @@
 package com.chris.util;
 
 import com.chris.syncData.SyncData;
-import com.chris.writer.PostgreSQLWriter;
+import com.chris.writer.Writer;
 import org.apache.log4j.Logger;
 
 import java.io.Serializable;
@@ -18,7 +18,7 @@ import static com.chris.syncData.SyncData.EventTypeEnum.INSERT;
 
 public class ParseUtil {
 
-    private static final Logger logger = Logger.getLogger(PostgreSQLWriter.class);
+    private static final Logger logger = Logger.getLogger(Writer.class);
 
     public static List<List<String>> parseMySQLBinLogRows(List<Serializable[]> rows) {
         List<List<String>> rowsData = new ArrayList<>();
@@ -50,7 +50,6 @@ public class ParseUtil {
     }
 
     public static void parsePGLogicalSlot(ResultSet resultSet, SyncData syncData, String tableName) {
-        List<List<String>> rowsData = new ArrayList<>();
         try {
             while (resultSet.next()) {
                 // 获取原始数据
@@ -81,7 +80,7 @@ public class ParseUtil {
                             rows.add(matcher.group().replace("'", ""));
                         }
                         syncData.setEventType(eventType);
-                        syncData.setRows(rows.toArray(new String[0]));
+                        syncData.setRows(rows);
                         break;
                     default:
                         break;
@@ -92,10 +91,7 @@ public class ParseUtil {
         }
     }
 
-    public static void parseSQLServerCDC(ResultSet resultSet, SyncData syncData) {
-        List<List<String>> rowsData = new ArrayList<>();
-        String[] fieldsName = syncData.getFieldsName();
-
+    public static void parseSQLServerCDC(ResultSet resultSet, String[] fieldNames, SyncData syncData) {
         try {
             while (resultSet.next()) {
                 SyncData.EventTypeEnum curEventType = getSQLServerEventType(resultSet.getString("__$operation"));
@@ -105,11 +101,11 @@ public class ParseUtil {
                         List<String> rows = new ArrayList<>();
 
                         // 根据字段名称获取对应数据
-                        for (String fieldName: fieldsName) {
+                        for (String fieldName: fieldNames) {
                             rows.add(resultSet.getString(fieldName));
                         }
                         syncData.setEventType(INSERT);
-                        syncData.setRows(rows.toArray(new String[0]));
+                        syncData.setRows(rows);
                         break;
                     default:
                         break;
