@@ -167,12 +167,12 @@ resources/conf.properties
 #### 配置信息
 
 ```sql
-configuration.hostname = localhost
-configuration.port = 3306
-configuration.databaseName = test
-configuration.user = root
-configuration.password = 123456
-configuration.tableName = db_sync_config
+conf.hostname = localhost
+conf.port = 3306
+conf.databaseName = test
+conf.user = root
+conf.password = 123456
+conf.tableName = db_sync_config
 ```
 
 ### 配置获取

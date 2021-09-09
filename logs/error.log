@@ -1,7 +1,4 @@
-2021-09-08 11:22:58  [ main:2 ] - [ ERROR ]  java.lang.NullPointerException
-2021-09-08 11:23:27  [ main:0 ] - [ ERROR ]  java.lang.NullPointerException
-2021-09-08 11:23:27  [ main:2 ] - [ ERROR ]  java.lang.NullPointerException
-2021-09-08 11:23:38  [ main:0 ] - [ ERROR ]  java.lang.NullPointerException
-2021-09-08 11:23:38  [ main:1 ] - [ ERROR ]  java.lang.NullPointerException
-2021-09-08 11:24:03  [ main:0 ] - [ ERROR ]  java.lang.NullPointerException
-2021-09-08 11:24:03  [ main:1 ] - [ ERROR ]  java.lang.NullPointerException
+2021-09-09 14:53:14  [ Thread-1:25 ] - [ ERROR ]  org.postgresql.util.PSQLException: ERROR: invalid input syntax for type integer: "Vonng create_time[text]:2021-09-09 14:53:12"
+  位置：26
+2021-09-09 14:53:14  [ Thread-1:40 ] - [ ERROR ]  org.postgresql.util.PSQLException: ERROR: invalid input syntax for type integer: "Xiao Wang create_time[text]:2021-09-09 14:53:12"
+  位置：26
