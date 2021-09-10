@@ -1,6 +1,7 @@
 package pers.chris.dbSync.conf;
 
 import pers.chris.dbSync.common.DBTypeEnum;
+import pers.chris.dbSync.util.ConnectUtil;
 
 public class DBConf {
 
@@ -13,15 +14,7 @@ public class DBConf {
     private String tableName;
 
     public String getUrl() {
-        return "jdbc:" + dbType.toString().toLowerCase() + "://" + hostname + ":" + port + "/" + dbName;
-    }
-
-    public DBTypeEnum getDBType() {
-        return dbType;
-    }
-
-    public void setDBType(DBTypeEnum dbType) {
-        this.dbType = dbType;
+        return ConnectUtil.getUrl(dbType, hostname, port, dbName);
     }
 
     public String getHostname() {
@@ -71,4 +64,5 @@ public class DBConf {
     public void setTableName(String tableName) {
         this.tableName = tableName;
     }
+
 }

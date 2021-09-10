@@ -1,8 +1,9 @@
 package pers.chris.dbSync.reader;
 
+import pers.chris.dbSync.syncData.EventTypeEnum;
 import pers.chris.dbSync.syncData.SyncData;
 import pers.chris.dbSync.util.FieldUtil;
-import pers.chris.dbSync.util.ParseResultUtil;
+import pers.chris.dbSync.util.ResultSetUtil;
 import com.github.shyiko.mysql.binlog.BinaryLogClient;
 import com.github.shyiko.mysql.binlog.event.*;
 import com.github.shyiko.mysql.binlog.event.deserialization.EventDeserializer;
@@ -29,7 +30,7 @@ public class MySQLReader extends Reader {
 
     // binlog监听客户端配置
     private void binlogClientConfig(SyncData syncData) {
-        // 内部类使用需要，当前数据库名和表名
+        // 内部类使用限制，当前数据库名和表名
         final String[] curDataBaseName = {null};
         final String[] curTableName = {null};
 
@@ -43,31 +44,28 @@ public class MySQLReader extends Reader {
 
         binlogClient.setEventDeserializer(eventDeserializer);
 
-        binlogClient.registerEventListener(new BinaryLogClient.EventListener() {
-            // 重写监听方法onEvent
-            @Override
-            public void onEvent(Event event) {
-                EventData eventData = event.getData();
+        // 重写监听方法onEvent
+        binlogClient.registerEventListener(event -> {
+            EventData eventData = event.getData();
 
-                // 获取数据库、表信息
-                if (eventData instanceof TableMapEventData) {
-                    TableMapEventData tableMapEventData = (TableMapEventData) eventData;
+            // 获取数据库、表信息
+            if (eventData instanceof TableMapEventData) {
+                TableMapEventData tableMapEventData = (TableMapEventData) eventData;
 
-                    curDataBaseName[0] = tableMapEventData.getDatabase();
-                    curTableName[0] = tableMapEventData.getTable();
-                }
-                // 获取事件类型INSERT的数据
-                else if (eventData instanceof WriteRowsEventData) {
-                    if (getReaderConfig().getDBName().equals(curDataBaseName[0])
-                            && getReaderConfig().getTableName().equals(curTableName[0])) {
-                        WriteRowsEventData writeRowsEventData = (WriteRowsEventData) eventData;
+                curDataBaseName[0] = tableMapEventData.getDatabase();
+                curTableName[0] = tableMapEventData.getTable();
+            }
+            // 获取事件类型INSERT的数据
+            else if (eventData instanceof WriteRowsEventData) {
+                if (getReaderConfig().getDBName().equals(curDataBaseName[0])
+                        && getReaderConfig().getTableName().equals(curTableName[0])) {
+                    WriteRowsEventData writeRowsEventData = (WriteRowsEventData) eventData;
 
-                        List<List<String>> valuesData = ParseResultUtil.parseMySQLBinLogRows(writeRowsEventData.getRows());
+                    List<List<String>> valuesData = ResultSetUtil.parseMySQLBinLogRows(writeRowsEventData.getRows());
 
-                        syncData.setEventType(SyncData.EventTypeEnum.INSERT);
-                        for (List<String> values: valuesData) {
-                            syncData.setRows(FieldUtil.list2Map(getFields(), values));
-                        }
+                    syncData.setEventType(EventTypeEnum.INSERT);
+                    for (List<String> values: valuesData) {
+                        syncData.setRows(FieldUtil.mergeFieldAndValue(getFields(), values));
                     }
                 }
             }
@@ -81,4 +79,5 @@ public class MySQLReader extends Reader {
             logger.error(e);
         }
     }
+
 }

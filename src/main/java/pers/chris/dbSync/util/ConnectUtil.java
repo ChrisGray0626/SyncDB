@@ -11,17 +11,17 @@ import java.util.Map;
 
 public class ConnectUtil {
 
-    private static final Map<DBTypeEnum, String> map = new HashMap<>();
+    private static final Map<DBTypeEnum, String> drivers = new HashMap<>();
     private static final Logger logger = Logger.getLogger(ConnectUtil.class);
 
     static {
-        map.put(DBTypeEnum.MYSQL, "com.mysql.cj.jdbc.Driver");
-        map.put(DBTypeEnum.POSTGRESQL, "org.postgresql.Driver");
-        map.put(DBTypeEnum.SQLSERVER, "com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        drivers.put(DBTypeEnum.MYSQL, "com.mysql.cj.jdbc.Driver");
+        drivers.put(DBTypeEnum.POSTGRESQL, "org.postgresql.Driver");
+        drivers.put(DBTypeEnum.SQLSERVER, "com.microsoft.sqlserver.jdbc.SQLServerDriver");
     }
 
     public static Connection connect(DBTypeEnum dbType, String url, String user, String password) {
-        String driverName = map.get(dbType);
+        String driverName = drivers.get(dbType);
         try {
             Class.forName(driverName);
         } catch (ClassNotFoundException e) {
@@ -38,4 +38,5 @@ public class ConnectUtil {
     public static String getUrl(DBTypeEnum dbType, String hostname, String port, String dbName) {
             return "jdbc:" + dbType.toString().toLowerCase() + "://" + hostname + ":" + port + "/" + dbName;
     }
+
 }

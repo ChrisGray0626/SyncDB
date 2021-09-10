@@ -1,6 +1,6 @@
 package pers.chris.dbSync;
 
-import pers.chris.dbSync.job.DBSyncJobManager;
+import pers.chris.dbSync.job.JobManager;
 import org.apache.log4j.Logger;
 
 
@@ -10,10 +10,10 @@ public class DBSync {
 
     public static void main(String[] args) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
         String confFileName = "resources/conf.properties";
-        DBSyncJobManager dbSyncJobManager = new DBSyncJobManager();
+        JobManager jobManager = new JobManager();
 
-        dbSyncJobManager.config(confFileName);
-        dbSyncJobManager.configJob();
-        dbSyncJobManager.run();
+        jobManager.config(confFileName);
+        jobManager.readJobConf();
+        jobManager.run();
     }
 }

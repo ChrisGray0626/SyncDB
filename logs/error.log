@@ -1,4 +1,24 @@
-2021-09-09 14:53:14  [ Thread-1:25 ] - [ ERROR ]  org.postgresql.util.PSQLException: ERROR: invalid input syntax for type integer: "Vonng create_time[text]:2021-09-09 14:53:12"
+2021-09-10 10:54:58  [ Thread-2:0 ] - [ ERROR ]  org.postgresql.util.PSQLException: ERROR: value "1631242498000" is out of range for type integer
   位置：26
-2021-09-09 14:53:14  [ Thread-1:40 ] - [ ERROR ]  org.postgresql.util.PSQLException: ERROR: invalid input syntax for type integer: "Xiao Wang create_time[text]:2021-09-09 14:53:12"
+2021-09-10 10:54:58  [ Thread-2:10 ] - [ ERROR ]  org.postgresql.util.PSQLException: ERROR: value "1631242498000" is out of range for type integer
+  位置：26
+2021-09-10 10:56:28  [ Thread-2:0 ] - [ ERROR ]  org.postgresql.util.PSQLException: ERROR: value "1631242588000" is out of range for type integer
+  位置：26
+2021-09-10 10:56:28  [ Thread-2:5 ] - [ ERROR ]  org.postgresql.util.PSQLException: ERROR: value "1631242588000" is out of range for type integer
+  位置：26
+2021-09-10 10:57:14  [ Thread-2:46046 ] - [ ERROR ]  org.postgresql.util.PSQLException: ERROR: value "1631242634000" is out of range for type integer
+  位置：26
+2021-09-10 10:57:14  [ Thread-2:46051 ] - [ ERROR ]  org.postgresql.util.PSQLException: ERROR: value "1631242634000" is out of range for type integer
+  位置：26
+2021-09-10 10:57:49  [ Thread-1:0 ] - [ ERROR ]  org.postgresql.util.PSQLException: ERROR: invalid input syntax for type integer: "2021-09-10 10:57:39"
+  位置：26
+2021-09-10 10:57:49  [ Thread-1:5 ] - [ ERROR ]  org.postgresql.util.PSQLException: ERROR: invalid input syntax for type integer: "2021-09-10 10:57:39"
+  位置：26
+2021-09-10 10:58:45  [ Thread-2:56325 ] - [ ERROR ]  org.postgresql.util.PSQLException: ERROR: value "1631242725000" is out of range for type integer
+  位置：26
+2021-09-10 10:58:45  [ Thread-2:56332 ] - [ ERROR ]  org.postgresql.util.PSQLException: ERROR: value "1631242725000" is out of range for type integer
+  位置：26
+2021-09-10 11:00:57  [ Thread-2:12 ] - [ ERROR ]  org.postgresql.util.PSQLException: ERROR: value "1631242857000" is out of range for type integer
+  位置：26
+2021-09-10 11:00:57  [ Thread-2:20 ] - [ ERROR ]  org.postgresql.util.PSQLException: ERROR: value "1631242857000" is out of range for type integer
   位置：26

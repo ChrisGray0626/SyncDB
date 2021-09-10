@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 // 动态加载实现类工具
-public class LoadClassUtil {
+public class ClassLoadUtil {
 
     private static final Map<DBTypeEnum, String> map = new HashMap<>();
 

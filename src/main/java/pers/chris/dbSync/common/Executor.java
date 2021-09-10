@@ -4,7 +4,7 @@ package pers.chris.dbSync.common;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Task {
+public abstract class Executor {
 
     public DBTypeEnum dbType;
     private List<String> fields = new ArrayList<>();
@@ -19,4 +19,5 @@ public abstract class Task {
     public void setFields(List<String> fields) {
         this.fields = fields;
     }
+
 }

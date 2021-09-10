@@ -1,10 +1,11 @@
 package pers.chris.dbSync.writer;
 
 import pers.chris.dbSync.conf.DBConf;
+import pers.chris.dbSync.syncData.EventTypeEnum;
 import pers.chris.dbSync.syncData.SyncData;
 import pers.chris.dbSync.util.ConnectUtil;
 import pers.chris.dbSync.util.FieldUtil;
-import pers.chris.dbSync.util.GenerateSQLUtil;
+import pers.chris.dbSync.util.SQLUtil;
 import org.apache.log4j.Logger;
 
 import java.sql.Connection;
@@ -28,20 +29,20 @@ public class Writer extends AbstractWriter {
     @Override
     public void write(SyncData syncData) {
         Map<String, String> rows = syncData.getRows();
-        SyncData.EventTypeEnum curEventType = syncData.getEventType();
+        EventTypeEnum eventType = syncData.getEventType();
 
         String SQL = null;
-        switch (curEventType) {
+        switch (eventType) {
             case INSERT:
-                SQL = GenerateSQLUtil.insertSQL(getWriterConfig().getTableName(), rows);
+                SQL = SQLUtil.insertSQL(getWriterConfig().getTableName(), rows);
                 break;
             default:
         }
 
         try {
             Statement statement = connection.createStatement();
-            statement.execute(SQL);
             logger.debug(SQL);
+            statement.execute(SQL);
         } catch (SQLException e) {
             logger.error(e);
         }

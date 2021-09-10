@@ -1,7 +1,7 @@
 package pers.chris.dbSync.reader;
 
 import pers.chris.dbSync.syncData.SyncData;
-import pers.chris.dbSync.util.ParseResultUtil;
+import pers.chris.dbSync.util.ResultSetUtil;
 import pers.chris.dbSync.common.DBTypeEnum;
 import org.apache.log4j.Logger;
 
@@ -37,10 +37,12 @@ public class SQLServerReader extends Reader {
             ResultSet resultSet = statement.executeQuery(
                     "DECLARE @bglsn VARBINARY(10)=sys.fn_cdc_map_time_to_lsn('smallest greater than or equal',DATEADD(mi,-" + interval + ",GETDATE()));"
                     + "DECLARE @edlsn VARBINARY(10)=sys.fn_cdc_map_time_to_lsn('largest less than or equal',GETDATE());"
-                    + "SELECT * FROM cdc.dbo_" + getReaderConfig().getTableName() + "_CT WHERE [__$start_lsn] BETWEEN @bglsn AND @edlsn");
-            ParseResultUtil.parseSQLServerCDC(resultSet, getFields(), syncData);
+                    + "SELECT * FROM cdc.dbo_" + getReaderConfig().getTableName() + "_CT "
+                            + "WHERE [__$start_lsn] BETWEEN @bglsn AND @edlsn");
+            ResultSetUtil.parseSQLServerCDC(resultSet, getFields(), syncData);
         } catch (SQLException | NullPointerException e) {
             logger.error(e);
         }
     }
+
 }

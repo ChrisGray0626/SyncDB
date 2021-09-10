@@ -1,12 +1,12 @@
-package pers.chris.dbSync.mapper;
+package pers.chris.dbSync.fieldMap;
 
 import java.util.List;
 
-public class FieldMapper {
+public class FieldMap {
 
     private List<String> srcFields; // 映射源字段
     private List<String> dstFields; // 映射目标字段
-    private String mapRule; // 映射规则
+    private String rule; // 映射规则
 
     public List<String> getSrcFields() {
         return srcFields;
@@ -24,11 +24,12 @@ public class FieldMapper {
         this.dstFields = dstFields;
     }
 
-    public String getMapRule() {
-        return mapRule;
+    public String getRule() {
+        return rule;
     }
 
-    public void setMapRule(String mapRule) {
-        this.mapRule = mapRule;
+    public void setRule(String rule) {
+        this.rule = rule;
     }
+
 }

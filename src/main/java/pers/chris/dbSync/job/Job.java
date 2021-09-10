@@ -4,27 +4,40 @@ import pers.chris.dbSync.conf.DBConf;
 import pers.chris.dbSync.conf.SyncDataConf;
 import pers.chris.dbSync.reader.Reader;
 import pers.chris.dbSync.syncData.SyncData;
-import pers.chris.dbSync.util.LoadClassUtil;
+import pers.chris.dbSync.util.ClassLoadUtil;
 import pers.chris.dbSync.writer.Writer;
 import org.apache.log4j.Logger;
 
-public class DBSyncJob implements Runnable {
+public class Job implements Runnable {
 
     private String jobId;
+    public JobTypeEnum jobType;
     private SyncDataConf syncDataConf;
     private DBConf writerConf;
     private DBConf readerConf;
     private SyncData syncData;
     private Writer writer;
     private Reader reader;
-    private final Logger logger = Logger.getLogger(DBSyncJob.class);
+    private final Logger logger = Logger.getLogger(Job.class);
 
     @Override
     public void run() {
+        switch (jobType) {
+            case PULL:
+                runByPull();
+                break;
+            case PUSH:
+                runByPush();
+                break;
+            default:
+        }
+    }
+
+    private void runByPush() {
         syncData = new SyncData();
         try {
-            writer = LoadClassUtil.loadWriterClass(writerConf.getDBType());
-            reader = LoadClassUtil.loadReaderClass(readerConf.getDBType());
+            writer = ClassLoadUtil.loadWriterClass(writerConf.dbType);
+            reader = ClassLoadUtil.loadReaderClass(readerConf.dbType);
         } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -33,11 +46,18 @@ public class DBSyncJob implements Runnable {
         writer.setWriterConfig(writerConf);
         reader.setReaderConfig(readerConf);
 
-        syncData.registerListener(event -> writer.write(syncData));
+        syncData.configFieldMapManager();
+        syncData.registerListener(event -> {
+            writer.write(syncData);
+        });
         writer.connect();
         reader.connect();
 
         reader.read(syncData, syncDataConf.getInterval());
+    }
+
+    private void runByPull() {
+
     }
 
     public String getJobId() {
@@ -71,4 +91,5 @@ public class DBSyncJob implements Runnable {
     public void setSyncDataConf(SyncDataConf syncDataConf) {
         this.syncDataConf = syncDataConf;
     }
+
 }

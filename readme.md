@@ -1,10 +1,15 @@
-# SyncDB
+# Readme
 
-## Reader
+## 执行器（Executor）
 
-### MySQLReader
+### 读取执行器（Reader）
 
-#### 二进制日志（binlog）
+- 统一的连接方法
+- 统一的读取方法（Pull时使用）
+
+#### MySQLReader
+
+##### 二进制日志（binlog）
 
 1. 在my.ini中配置开启binLog服务
 
@@ -21,15 +26,15 @@
 
 1. 使用开源框架[mysql-binlog-connector-java]([shyiko/mysql-binlog-connector-java: MySQL Binary Log connector (github.com)](https://github.com/shyiko/mysql-binlog-connector-java))监听binlog
 
-#### 数据格式
+##### 数据格式
 
 - TableMapEventData：包含变化的库名和表名
 - WriteRowsEventData：包含新增数据内容（不含字段名），默认格式为List<Serializable[]>
 - 不同事件类型对应EventData的不同EventType
 
-### PostgreSQLReader
+#### PostgreSQLReader
 
-#### 逻辑解码（Logical Decoding）
+##### 逻辑解码（Logical Decoding）
 
 1. 配置wal_level = logical
 
@@ -50,18 +55,18 @@
 
 1. 定时轮询逻辑复制槽
 
-#### 数据格式
+##### 数据格式
 
 - table：包含模式、表名、事件类型、数据内容（含字段名与字段类型），且均在一个字段data中
 - 格式Text的数据自带单引号
 
-#### 注意事项
+##### 注意事项
 
-- 如果修改逻辑复制槽名称，请使用PostgreSQLReader的方法setLogicalReplicationSlotName设置名称。
+- 如需修改逻辑复制槽名称，请使用PostgreSQLReader的方法setLogicalReplicationSlotName设置名称。
 
-### SQLServerReader
+#### SQLServerReader
 
-#### 变更数据捕获（Change Data Capture）
+##### 变更数据捕获（Change Data Capture）
 
 1. 启动 SQL Server 代理服务
 1. 启动数据库CDC服务
@@ -111,14 +116,14 @@
 
 1. 定时轮询CDC库表
 
-### 数据格式
+##### 数据格式
 
 - dbo_tableName_CT：包含表名、事件类型、数据内容（含字段名）
 - 表名直接为CDC表名的一部分
 - 事件类型由字段__$operation表示
 - 数据字段直接为CDC表字段的一部分
 
-#### 注意事项
+##### 注意事项
 
 - 如果库表有字段更新需要禁用并重新启动CDC服务，否则将无法记录新增字段并且出错。
 
@@ -130,15 +135,12 @@
 
 - CDC文件中字段内容末尾默认有大量空格。
 
-## Writer
+### 写入执行器（Writer）
 
-### 监听同步数据集
+- 统一的连接方法
+- 统一的写入方法
 
-1. 注册监听器（registerListener）
-1. 重写监听器的方法doSet
-1. 监听同步数据集的数据变化
-
-### PostgreSQLWriter
+#### PostgreSQLWriter
 
 ## 同步数据集（SyncData）
 
@@ -146,46 +148,83 @@
 
 监听器建立在属性rows上，每次调用方法setRows后，将调用监听器的方法doSet。
 
-### 数据格式
+#### 数据格式
 
-List<String> rows
+Map<String, String> rows
 
-## 数据映射（Mapper）
+## 作业（Job）
+
+### 作业管理器（JobManager）
+
+- 多线程作业
+
+#### 数据库配置（conf.properties)
+
+```properties
+conf.dbType = MYSQL
+conf.hostname = localhost
+conf.port = 3306
+conf.dbName = test
+conf.user = root
+conf.password = 123456
+conf.tableName = db_sync_conf
+```
+
+#### 作业配置（jobConf）
+
+- 读取数据库指定库表db_sync_conf
+
+### 监听同步数据集
+
+1. 注册监听器（registerListener）
+1. 监听同步数据集的数据变化
+1. 重写监听器的方法doSet
+
+```java
+syncData.registerListener(event -> {
+    writer.write(syncData);
+});
+```
+
+## 字段映射（FieldMap）
+
+- 源字段
+- 目标字段
+- 映射规则
+
+// TODO 规则定义
+
+#### 字段映射管理器（FieldMapManager）
+
+- 配置多条字段规则
 
 ## 数据过滤（Filter）
 
-## 配置信息（Config）
+// TODO Filter
 
-配置信息的具体内容存储至数据库中。
+## 配置信息（Conf）
 
-### 配置连接（MySQL）
+- 数据库配置信息（DBConf）
+- 同步数据集配置信息（SyncDataConf）
 
-#### 文件位置
-
-resources/conf.properties
-
-#### 配置信息
-
-```sql
-conf.hostname = localhost
-conf.port = 3306
-conf.databaseName = test
-conf.user = root
-conf.password = 123456
-conf.tableName = db_sync_config
-```
-
-### 配置获取
-
-
+- 配置信息的具体内容存储至数据库指定库表db_sync_conf
 
 ### 配置规范
 
-#### DBType
+#### 作业类型（JobType）
+
+- PULL
+- PUSH
+
+#### 数据库类型（DBType）
 
 - MYSQL
 - POSTGRESQL
 - SQLSERVER
+
+#### 事件类型（EventType）
+
+- INSERT
 
 ## 日志（Log）
 
@@ -214,5 +253,5 @@ log4j.appender.Database.layout=org.apache.log4j.PatternLayout
 
 ## 注意事项
 
-- 抽象类Writer/Reader必须与实现类放在同一package下，否则无法动态加载实现类。
+- Writer/Reader必须与实现类放在同一package下，否则无法动态加载实现类。
 

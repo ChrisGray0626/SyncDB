@@ -2,7 +2,7 @@ package pers.chris.dbSync.syncData;
 
 import pers.chris.dbSync.conf.SyncDataConf;
 import org.apache.log4j.Logger;
-import pers.chris.dbSync.mapper.FieldMapperManager;
+import pers.chris.dbSync.fieldMap.FieldMapManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,9 +11,8 @@ import java.util.Map;
 public class SyncData {
     private EventTypeEnum eventType;
     private SyncDataConf syncDataConf;
-    // TODO fieldMapperManager
-    private FieldMapperManager fieldMapperManager;
     private Map<String, String> rows;
+    private FieldMapManager fieldMapManager;
     private SyncDataListener syncDataListener;
     private final Logger logger = Logger.getLogger(SyncData.class);
 
@@ -21,8 +20,14 @@ public class SyncData {
         rows = new HashMap<>();
     }
 
+    public void configFieldMapManager () {
+        fieldMapManager = new FieldMapManager();
+        fieldMapManager.configRules(syncDataConf.getFieldMapRules());
+    }
+
+    // 数据映射在此进行
     public void setRows(Map<String, String> rows) {
-        this.rows = rows;
+        this.rows = fieldMapManager.map(rows);
         syncDataListener.doSet(new SyncDataEvent(this));
     }
 
@@ -45,12 +50,6 @@ public class SyncData {
         return stringBuilder.toString();
     }
 
-    public enum EventTypeEnum {
-        INSERT,
-        UPDATE,
-        DELETE
-    }
-
     public EventTypeEnum getEventType() {
         return eventType;
     }
@@ -70,5 +69,14 @@ public class SyncData {
     public Map<String, String> getRows() {
         return rows;
     }
+
+    public FieldMapManager getFieldMapManager() {
+        return fieldMapManager;
+    }
+
+    public void setFieldMapManager(FieldMapManager fieldMapManager) {
+        this.fieldMapManager = fieldMapManager;
+    }
+
 }
 

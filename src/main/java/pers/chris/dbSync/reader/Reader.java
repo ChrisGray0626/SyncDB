@@ -4,7 +4,7 @@ import pers.chris.dbSync.conf.DBConf;
 import pers.chris.dbSync.syncData.SyncData;
 import pers.chris.dbSync.util.ConnectUtil;
 import pers.chris.dbSync.util.FieldUtil;
-import pers.chris.dbSync.util.ParseResultUtil;
+import pers.chris.dbSync.util.ResultSetUtil;
 import pers.chris.dbSync.util.TimeUtil;
 import org.apache.log4j.Logger;
 
@@ -39,7 +39,7 @@ public class Reader extends AbstractReader{
                 ResultSet resultSet = statement.executeQuery(
                         "select * from " + getReaderConfig().getTableName()
                                 + " where " + timeFieldName + " >= " + time);
-                ParseResultUtil.parseSQL(resultSet, syncData, getFields());
+                ResultSetUtil.parseGeneralSQL(resultSet, syncData, getFields());
             } catch (SQLException e) {
                 logger.error(e);
             }
@@ -73,7 +73,4 @@ public class Reader extends AbstractReader{
         return connection;
     }
 
-    public void setConnection(Connection connection) {
-        this.connection = connection;
-    }
 }
