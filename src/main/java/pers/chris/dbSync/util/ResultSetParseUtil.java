@@ -21,7 +21,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class ResultSetUtil {
+public class ResultSetParseUtil {
 
     private static final Logger logger = Logger.getLogger(Writer.class);
 

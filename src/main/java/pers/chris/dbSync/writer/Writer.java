@@ -8,9 +8,7 @@ import pers.chris.dbSync.util.FieldUtil;
 import pers.chris.dbSync.util.SQLUtil;
 import org.apache.log4j.Logger;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.Map;
 
 public class Writer extends AbstractWriter {
@@ -22,12 +20,22 @@ public class Writer extends AbstractWriter {
     @Override
     public void connect() {
         connection = ConnectUtil.connect(getWriterConfig().dbType, getWriterConfig().getUrl(), getWriterConfig().getUser(), getWriterConfig().getPassword());
-        assert connection != null;
-        setFields(FieldUtil.readFields(connection, getWriterConfig().getTableName()));
     }
 
     @Override
-    public void write(SyncData syncData) {
+    public void readField() {
+        try {
+            DatabaseMetaData metaData = connection.getMetaData();
+            ResultSet resultSet = metaData.getColumns(null, "%", getWriterConfig().getTableName(), "%");
+            setFields(FieldUtil.read(resultSet));
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public synchronized void write(SyncData syncData) {
         Map<String, String> rows = syncData.getRows();
         EventTypeEnum eventType = syncData.getEventType();
 

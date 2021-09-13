@@ -53,6 +53,8 @@ public class Job implements Runnable {
         writer.connect();
         reader.connect();
 
+        reader.readField();
+        writer.readField();
         reader.read(syncData, syncDataConf.getInterval());
     }
 

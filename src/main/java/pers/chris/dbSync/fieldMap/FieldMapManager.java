@@ -20,27 +20,11 @@ public class FieldMapManager {
         }
     }
 
-    public Map<String, String> map(Map<String, String> rows) {
+    public Map<String, String> run(Map<String, String> rows) {
         for (FieldMap fieldMap: fieldMappers) {
-            if (fieldMap.getDstFields().size() == 1) {
-                rows = multi2One(fieldMap, rows);
-            }
+            fieldMap.check();
+            fieldMap.map(rows);
         }
-        return rows;
-    }
-
-    public Map<String, String> multi2One(FieldMap fieldMap, Map<String, String> rows) {
-        List<String> srcFields = fieldMap.getSrcFields();
-        String dstField = fieldMap.getDstFields().get(0);
-        StringBuilder dstValue = new StringBuilder();
-
-        for (String field: srcFields) {
-            String value = rows.get(field);
-            dstValue.append(value);
-            rows.remove(field);
-        }
-
-        rows.put(dstField, dstValue.toString());
         return rows;
     }
 

@@ -4,14 +4,11 @@ import pers.chris.dbSync.conf.DBConf;
 import pers.chris.dbSync.syncData.SyncData;
 import pers.chris.dbSync.util.ConnectUtil;
 import pers.chris.dbSync.util.FieldUtil;
-import pers.chris.dbSync.util.ResultSetUtil;
+import pers.chris.dbSync.util.ResultSetParseUtil;
 import pers.chris.dbSync.util.TimeUtil;
 import org.apache.log4j.Logger;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.concurrent.TimeUnit;
 
 public class Reader extends AbstractReader{
@@ -24,8 +21,19 @@ public class Reader extends AbstractReader{
     public void connect() {
         connection = ConnectUtil.connect(getReaderConfig().dbType, getReaderConfig().getUrl(), getReaderConfig().getUser(), getReaderConfig().getPassword());
         assert connection != null;
-        // 获取字段
-        setFields(FieldUtil.readFields(connection, getReaderConfig().getTableName()));
+    }
+
+    // 读取字段信息（名字、类型）
+    @Override
+    public void readField() {
+        try {
+            DatabaseMetaData metaData = connection.getMetaData();
+            ResultSet resultSet = metaData.getColumns(null, "%", getReaderConfig().getTableName(), "%");
+            setFields(FieldUtil.read(resultSet));
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     // 默认read方式，Pull
@@ -39,7 +47,7 @@ public class Reader extends AbstractReader{
                 ResultSet resultSet = statement.executeQuery(
                         "select * from " + getReaderConfig().getTableName()
                                 + " where " + timeFieldName + " >= " + time);
-                ResultSetUtil.parseGeneralSQL(resultSet, syncData, getFields());
+                ResultSetParseUtil.parseGeneralSQL(resultSet, syncData, getFieldNames());
             } catch (SQLException e) {
                 logger.error(e);
             }

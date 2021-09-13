@@ -3,7 +3,7 @@ package pers.chris.dbSync.reader;
 import pers.chris.dbSync.syncData.EventTypeEnum;
 import pers.chris.dbSync.syncData.SyncData;
 import pers.chris.dbSync.util.FieldUtil;
-import pers.chris.dbSync.util.ResultSetUtil;
+import pers.chris.dbSync.util.ResultSetParseUtil;
 import com.github.shyiko.mysql.binlog.BinaryLogClient;
 import com.github.shyiko.mysql.binlog.event.*;
 import com.github.shyiko.mysql.binlog.event.deserialization.EventDeserializer;
@@ -61,11 +61,11 @@ public class MySQLReader extends Reader {
                         && getReaderConfig().getTableName().equals(curTableName[0])) {
                     WriteRowsEventData writeRowsEventData = (WriteRowsEventData) eventData;
 
-                    List<List<String>> valuesData = ResultSetUtil.parseMySQLBinLogRows(writeRowsEventData.getRows());
+                    List<List<String>> valuesData = ResultSetParseUtil.parseMySQLBinLogRows(writeRowsEventData.getRows());
 
                     syncData.setEventType(EventTypeEnum.INSERT);
                     for (List<String> values: valuesData) {
-                        syncData.setRows(FieldUtil.mergeFieldAndValue(getFields(), values));
+                        syncData.setRows(FieldUtil.mergeFieldAndValue(getFieldNames(), values));
                     }
                 }
             }

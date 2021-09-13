@@ -1,22 +1,26 @@
 package pers.chris.dbSync.common;
 
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public abstract class Executor {
 
     public DBTypeEnum dbType;
-    private List<String> fields = new ArrayList<>();
+    private Map<String, String> fields;
 
     public abstract void connect();
+    public abstract void readField();
     public abstract void close();
 
-    public List<String> getFields() {
+    public List<String> getFieldNames() {
+        return new ArrayList<>(fields.keySet());
+    }
+
+    public Map<String, String> getFields() {
         return fields;
     }
 
-    public void setFields(List<String> fields) {
+    public void setFields(Map<String, String> fields) {
         this.fields = fields;
     }
 

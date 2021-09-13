@@ -3,7 +3,7 @@ package pers.chris.dbSync.job;
 import pers.chris.dbSync.util.ConnectUtil;
 import pers.chris.dbSync.common.DBTypeEnum;
 import org.apache.log4j.Logger;
-import pers.chris.dbSync.util.ResultSetUtil;
+import pers.chris.dbSync.util.ResultSetParseUtil;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -61,7 +61,7 @@ public class JobManager {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(
                     "select * from " + tableName);
-            jobs = ResultSetUtil.parseJobConf(resultSet);
+            jobs = ResultSetParseUtil.parseJobConf(resultSet);
         } catch (SQLException e) {
             logger.error(e);
         }

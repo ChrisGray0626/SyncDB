@@ -1,7 +1,7 @@
 package pers.chris.dbSync.reader;
 
 import pers.chris.dbSync.syncData.SyncData;
-import pers.chris.dbSync.util.ResultSetUtil;
+import pers.chris.dbSync.util.ResultSetParseUtil;
 import pers.chris.dbSync.writer.Writer;
 import pers.chris.dbSync.common.DBTypeEnum;
 import org.apache.log4j.Logger;
@@ -41,7 +41,7 @@ public class PostgreSQLReader extends Reader {
                     "SELECT * FROM pg_logical_slot_get_changes('"
                             + logicalReplicationSlotName
                             + "', NULL, NULL)");
-            ResultSetUtil.parsePGSQLLogicalSlot(resultSet, syncData, getReaderConfig().getTableName(), getFields());
+            ResultSetParseUtil.parsePGSQLLogicalSlot(resultSet, syncData, getReaderConfig().getTableName(), getFieldNames());
         } catch (SQLException e) {
             logger.error(e);
         }

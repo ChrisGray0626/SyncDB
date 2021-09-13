@@ -144,6 +144,22 @@
 
 ## 同步数据集（SyncData）
 
+- 多线程安全：方法write加同步锁
+
+### 字段映射（FieldMap）
+
+- 源字段
+- 目标字段
+- 规则配置
+- 格式检查
+- 字段映射
+
+#### 字段映射管理器（FieldMapManager）
+
+- 配置多条字段规则
+
+### 数据过滤（Filter）
+
 ### 监听器（SyncDataListener）
 
 监听器建立在属性rows上，每次调用方法setRows后，将调用监听器的方法doSet。
@@ -185,22 +201,6 @@ syncData.registerListener(event -> {
     writer.write(syncData);
 });
 ```
-
-## 字段映射（FieldMap）
-
-- 源字段
-- 目标字段
-- 映射规则
-
-// TODO 规则定义
-
-#### 字段映射管理器（FieldMapManager）
-
-- 配置多条字段规则
-
-## 数据过滤（Filter）
-
-// TODO Filter
 
 ## 配置信息（Conf）
 

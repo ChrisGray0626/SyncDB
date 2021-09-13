@@ -27,7 +27,7 @@ public class SyncData {
 
     // 数据映射在此进行
     public void setRows(Map<String, String> rows) {
-        this.rows = fieldMapManager.map(rows);
+        this.rows = fieldMapManager.run(rows);
         syncDataListener.doSet(new SyncDataEvent(this));
     }
 
