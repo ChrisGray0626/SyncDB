@@ -1,4 +1,4 @@
-package pers.chris.dbSync.fieldMap;
+package pers.chris.dbSync.fieldMapper;
 
 import org.apache.log4j.Logger;
 import pers.chris.dbSync.exception.FieldMapException;
@@ -7,12 +7,12 @@ import pers.chris.dbSync.util.FieldUtil;
 import java.util.List;
 import java.util.Map;
 
-public class FieldMap {
+public class FieldMapper {
 
     private List<String> srcFields; // 映射源字段
     private List<String> dstFields; // 映射目标字段
     private String rule; // 映射规则
-    private final Logger logger = Logger.getLogger(FieldMap.class);
+    private final Logger logger = Logger.getLogger(FieldMapper.class);
 
     public void check() {
         try {

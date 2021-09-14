@@ -2,9 +2,11 @@ package pers.chris.dbSync.job;
 
 import pers.chris.dbSync.conf.DBConf;
 import pers.chris.dbSync.conf.SyncDataConf;
+import pers.chris.dbSync.fieldMapper.FieldMapManager;
 import pers.chris.dbSync.reader.Reader;
 import pers.chris.dbSync.syncData.SyncData;
 import pers.chris.dbSync.util.ClassLoadUtil;
+import pers.chris.dbSync.valueFilter.ValueFilterManager;
 import pers.chris.dbSync.writer.Writer;
 import org.apache.log4j.Logger;
 
@@ -15,6 +17,8 @@ public class Job implements Runnable {
     private SyncDataConf syncDataConf;
     private DBConf writerConf;
     private DBConf readerConf;
+    private ValueFilterManager valueFilterManager;
+    private FieldMapManager fieldMapManager;
     private SyncData syncData;
     private Writer writer;
     private Reader reader;
@@ -22,31 +26,30 @@ public class Job implements Runnable {
 
     @Override
     public void run() {
-        switch (jobType) {
-            case PULL:
-                runByPull();
-                break;
-            case PUSH:
-                runByPush();
-                break;
-            default:
-        }
-    }
-
-    private void runByPush() {
         syncData = new SyncData();
+
         try {
+            switch (jobType) {
+                case PUSH:
+                    reader = ClassLoadUtil.loadReaderClass(readerConf.dbType);
+                    break;
+                case PULL:
+                    reader = new Reader();
+                    break;
+                default:
+            }
             writer = ClassLoadUtil.loadWriterClass(writerConf.dbType);
-            reader = ClassLoadUtil.loadReaderClass(readerConf.dbType);
-        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-            e.printStackTrace();
+        }
+        catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+            logger.error(e);
         }
 
         syncData.setSyncDataConfig(syncDataConf);
+        syncData.setFieldMapManager(fieldMapManager);
         writer.setWriterConfig(writerConf);
         reader.setReaderConfig(readerConf);
+        reader.setValueFilterManager(valueFilterManager);
 
-        syncData.configFieldMapManager();
         syncData.registerListener(event -> {
             writer.write(syncData);
         });
@@ -94,4 +97,19 @@ public class Job implements Runnable {
         this.syncDataConf = syncDataConf;
     }
 
+    public ValueFilterManager getValueFilterManager() {
+        return valueFilterManager;
+    }
+
+    public void setValueFilterManager(ValueFilterManager valueFilterManager) {
+        this.valueFilterManager = valueFilterManager;
+    }
+
+    public FieldMapManager getFieldMapManager() {
+        return fieldMapManager;
+    }
+
+    public void setFieldMapManager(FieldMapManager fieldMapManager) {
+        this.fieldMapManager = fieldMapManager;
+    }
 }

@@ -40,9 +40,7 @@ public class ResultSetParseUtil {
 
                 syncDataConf.setInterval(Integer.parseInt(resultSet.getString("sync_interval")));
                 syncDataConf.setTimeField(resultSet.getString("sync_time_field_name"));
-                // TODO FieldMap 规则配置
                 List<String> fieldMapRules = new ArrayList<>();
-                syncDataConf.setFieldMapRules(fieldMapRules);
                 writerConf.dbType = DBTypeEnum.valueOf(resultSet.getString("writer_db_type"));
                 writerConf.setHostname(resultSet.getString("writer_hostname"));
                 writerConf.setPort(resultSet.getString("writer_port"));
@@ -69,6 +67,34 @@ public class ResultSetParseUtil {
             logger.error(e);
         }
         return jobs;
+    }
+
+    public static List<String> parseFieldMapConf (ResultSet resultSet) {
+        List<String> rules = new ArrayList<>();
+        try {
+            while (resultSet.next()) {
+                String rule = resultSet.getString("rule");
+                rules.add(rule);
+            }
+        }
+        catch (SQLException e) {
+            logger.error(e);
+        }
+        return rules;
+    }
+
+    public static List<String> parseValueFilterConf (ResultSet resultSet) {
+        List<String> rules = new ArrayList<>();
+        try {
+            while (resultSet.next()) {
+                String rule = resultSet.getString("rule");
+                rules.add(rule);
+            }
+        }
+        catch (SQLException e) {
+            logger.error(e);
+        }
+        return rules;
     }
 
     // 解析常规（Pull方式）SQL

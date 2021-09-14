@@ -5,7 +5,13 @@
 ### 读取执行器（Reader）
 
 - 统一的连接方法
-- 统一的读取方法（Pull时使用）
+- 统一的读取方法（Pull）
+
+#### 数据过滤（Filter）
+
+- 编写过滤规则
+- 拼接SQL语句
+- 方法read执行时进行条件查询（Pull）
 
 #### MySQLReader
 
@@ -158,8 +164,6 @@
 
 - 配置多条字段规则
 
-### 数据过滤（Filter）
-
 ### 监听器（SyncDataListener）
 
 监听器建立在属性rows上，每次调用方法setRows后，将调用监听器的方法doSet。
@@ -173,22 +177,6 @@ Map<String, String> rows
 ### 作业管理器（JobManager）
 
 - 多线程作业
-
-#### 数据库配置（conf.properties)
-
-```properties
-conf.dbType = MYSQL
-conf.hostname = localhost
-conf.port = 3306
-conf.dbName = test
-conf.user = root
-conf.password = 123456
-conf.tableName = db_sync_conf
-```
-
-#### 作业配置（jobConf）
-
-- 读取数据库指定库表db_sync_conf
 
 ### 监听同步数据集
 
@@ -204,10 +192,19 @@ syncData.registerListener(event -> {
 
 ## 配置信息（Conf）
 
-- 数据库配置信息（DBConf）
-- 同步数据集配置信息（SyncDataConf）
+#### 数据库配置（conf.properties)
 
-- 配置信息的具体内容存储至数据库指定库表db_sync_conf
+```properties
+conf.dbType = MYSQL
+conf.hostname = localhost
+conf.port = 3306
+conf.dbName = test
+conf.user = root
+conf.password = 123456
+conf.syncJobConfTableName = sync_job_conf
+conf.fieldMapConfTableName = field_map_conf
+conf.valueFilterConfTableName = value_filter_conf
+```
 
 ### 配置规范
 

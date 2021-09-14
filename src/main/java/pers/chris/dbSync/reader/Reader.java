@@ -7,6 +7,7 @@ import pers.chris.dbSync.util.FieldUtil;
 import pers.chris.dbSync.util.ResultSetParseUtil;
 import pers.chris.dbSync.util.TimeUtil;
 import org.apache.log4j.Logger;
+import pers.chris.dbSync.valueFilter.ValueFilterManager;
 
 import java.sql.*;
 import java.util.concurrent.TimeUnit;
@@ -14,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 public class Reader extends AbstractReader{
 
     private DBConf readerConf;
+    private ValueFilterManager valueFilterManager;
     private Connection connection;
     private static final Logger logger = Logger.getLogger(Reader.class);
 
@@ -36,17 +38,18 @@ public class Reader extends AbstractReader{
         }
     }
 
-    // 默认read方式，Pull
     @Override
     public void read(SyncData syncData, Integer interval) {
-        String time = TimeUtil.intervalTime(interval);
         String timeFieldName = syncData.getSyncDataConfig().getTimeField();
         while (true) {
             try {
+                String time = TimeUtil.intervalTime(interval); // 当前时间
+                logger.debug(time);
                 Statement statement = connection.createStatement();
                 ResultSet resultSet = statement.executeQuery(
                         "select * from " + getReaderConfig().getTableName()
-                                + " where " + timeFieldName + " >= " + time);
+                                + " where " + timeFieldName + ">=" + time
+                                + valueFilterManager.filterSQL());
                 ResultSetParseUtil.parseGeneralSQL(resultSet, syncData, getFieldNames());
             } catch (SQLException e) {
                 logger.error(e);
@@ -75,6 +78,14 @@ public class Reader extends AbstractReader{
 
     public void setReaderConfig(DBConf readerConf) {
         this.readerConf = readerConf;
+    }
+
+    public ValueFilterManager getValueFilterManager() {
+        return valueFilterManager;
+    }
+
+    public void setValueFilterManager(ValueFilterManager valueFilterManager) {
+        this.valueFilterManager = valueFilterManager;
     }
 
     public Connection getConnection() {

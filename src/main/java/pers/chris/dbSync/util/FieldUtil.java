@@ -3,7 +3,7 @@ package pers.chris.dbSync.util;
 import org.apache.log4j.Logger;
 import pers.chris.dbSync.common.FieldTypeEnum;
 import pers.chris.dbSync.exception.FieldMapException;
-import pers.chris.dbSync.fieldMap.FieldMap;
+import pers.chris.dbSync.fieldMapper.FieldMapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -41,7 +41,6 @@ public class FieldUtil {
                 if (pointlessFields.contains(field)) {
                     continue;
                 }
-                logger.debug(type);
                 fields.put(field, type);
             }
         } catch (SQLException e) {
@@ -72,9 +71,9 @@ public class FieldUtil {
     }
 
     // TODO Parse Map Rule
-    public static FieldMap parseRule(String rules) {
-        FieldMap fieldMap = new FieldMap();
-        return fieldMap;
+    public static FieldMapper parseRule(String rules) {
+        FieldMapper fieldMapper = new FieldMapper();
+        return fieldMapper;
     }
 
 }

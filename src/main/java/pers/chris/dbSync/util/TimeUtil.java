@@ -9,9 +9,9 @@ public class TimeUtil {
     public static String intervalTime(Integer interval) {
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.MINUTE, -interval);
-        String pattern = "yyyy-MM-dd hh:mm:ss";
+        String pattern = "yyyy-MM-dd HH:mm:ss";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
 
-        return simpleDateFormat.format(calendar);
+        return "'" + simpleDateFormat.format(calendar.getTime()) + "'";
     }
 }

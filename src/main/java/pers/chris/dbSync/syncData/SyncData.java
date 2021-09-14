@@ -2,7 +2,7 @@ package pers.chris.dbSync.syncData;
 
 import pers.chris.dbSync.conf.SyncDataConf;
 import org.apache.log4j.Logger;
-import pers.chris.dbSync.fieldMap.FieldMapManager;
+import pers.chris.dbSync.fieldMapper.FieldMapManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,15 +20,13 @@ public class SyncData {
         rows = new HashMap<>();
     }
 
-    public void configFieldMapManager () {
-        fieldMapManager = new FieldMapManager();
-        fieldMapManager.configRules(syncDataConf.getFieldMapRules());
+    public void setRows(Map<String, String> rows) {
+        this.rows = fieldMap(rows);
+        syncDataListener.doSet(new SyncDataEvent(this));
     }
 
-    // 数据映射在此进行
-    public void setRows(Map<String, String> rows) {
-        this.rows = fieldMapManager.run(rows);
-        syncDataListener.doSet(new SyncDataEvent(this));
+    private Map<String, String> fieldMap (Map<String, String> rows) {
+        return fieldMapManager.run(rows);
     }
 
     public void registerListener(SyncDataListener syncDataListener) {
