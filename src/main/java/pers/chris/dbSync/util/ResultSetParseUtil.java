@@ -23,6 +23,8 @@ import java.util.regex.Pattern;
 
 public class ResultSetParseUtil {
 
+    private ResultSetParseUtil() {}
+
     private static final Logger logger = Logger.getLogger(Writer.class);
 
     public static List<Job> parseJobConf(ResultSet resultSet) {

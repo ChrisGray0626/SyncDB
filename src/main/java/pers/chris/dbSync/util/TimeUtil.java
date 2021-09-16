@@ -5,6 +5,7 @@ import java.util.Calendar;
 
 public class TimeUtil {
 
+    private TimeUtil() {}
     // 当前时间 - 时间间隔
     public static String intervalTime(Integer interval) {
         Calendar calendar = Calendar.getInstance();

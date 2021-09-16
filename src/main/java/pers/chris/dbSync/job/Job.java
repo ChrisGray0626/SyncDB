@@ -45,10 +45,8 @@ public class Job implements Runnable {
         }
 
         syncData.setSyncDataConfig(syncDataConf);
-        syncData.setFieldMapManager(fieldMapManager);
         writer.setWriterConfig(writerConf);
         reader.setReaderConfig(readerConf);
-        reader.setValueFilterManager(valueFilterManager);
 
         syncData.registerListener(event -> {
             writer.write(syncData);
@@ -56,8 +54,18 @@ public class Job implements Runnable {
         writer.connect();
         reader.connect();
 
-        reader.readField();
+        // 读取字段信息
         writer.readField();
+        reader.readField();
+
+        // 配置&加载数据过滤管理器
+        valueFilterManager.config();
+        reader.setValueFilterManager(valueFilterManager);
+
+        // 配置&检查&加载字段映射管理器
+        fieldMapManager.config();
+        fieldMapManager.check(writer.getFieldNames(), reader.getFieldNames());
+        syncData.setFieldMapManager(fieldMapManager);
         reader.read(syncData, syncDataConf.getInterval());
     }
 

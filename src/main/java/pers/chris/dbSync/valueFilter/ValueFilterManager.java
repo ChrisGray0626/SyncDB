@@ -11,10 +11,9 @@ public class ValueFilterManager {
     public ValueFilterManager (List<String> rules) {
         valueFilters = new ArrayList<>();
         this.rules = rules;
-        configRules();
     }
 
-    private void configRules() {
+    public void config() {
         for (String rule: rules) {
             valueFilters.add(new ValueFilter(rule));
         }

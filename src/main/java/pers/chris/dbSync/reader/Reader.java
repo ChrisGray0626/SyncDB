@@ -44,7 +44,6 @@ public class Reader extends AbstractReader{
         while (true) {
             try {
                 String time = TimeUtil.intervalTime(interval); // 当前时间
-                logger.debug(time);
                 Statement statement = connection.createStatement();
                 ResultSet resultSet = statement.executeQuery(
                         "select * from " + getReaderConfig().getTableName()

@@ -5,7 +5,7 @@ import pers.chris.dbSync.syncData.EventTypeEnum;
 import pers.chris.dbSync.syncData.SyncData;
 import pers.chris.dbSync.util.ConnectUtil;
 import pers.chris.dbSync.util.FieldUtil;
-import pers.chris.dbSync.util.SQLUtil;
+import pers.chris.dbSync.util.SQLGenerateUtil;
 import org.apache.log4j.Logger;
 
 import java.sql.*;
@@ -42,7 +42,7 @@ public class Writer extends AbstractWriter {
         String SQL = null;
         switch (eventType) {
             case INSERT:
-                SQL = SQLUtil.insertSQL(getWriterConfig().getTableName(), rows);
+                SQL = SQLGenerateUtil.insertSQL(getWriterConfig().getTableName(), rows);
                 break;
             default:
         }

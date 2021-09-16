@@ -2,7 +2,9 @@ package pers.chris.dbSync.util;
 
 import java.util.Map;
 
-public class SQLUtil {
+public class SQLGenerateUtil {
+
+    private SQLGenerateUtil() {}
 
     public static String insertSQL(String tableName, Map<String, String> rows) {
         StringBuilder fields = new StringBuilder();

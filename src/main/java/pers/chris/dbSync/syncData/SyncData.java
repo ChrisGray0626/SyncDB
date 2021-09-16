@@ -21,6 +21,7 @@ public class SyncData {
     }
 
     public void setRows(Map<String, String> rows) {
+//        this.rows = rows;
         this.rows = fieldMap(rows);
         syncDataListener.doSet(new SyncDataEvent(this));
     }

@@ -11,6 +11,8 @@ import java.util.Map;
 
 public class ConnectUtil {
 
+    private ConnectUtil() {}
+
     private static final Map<DBTypeEnum, String> drivers = new HashMap<>();
     private static final Logger logger = Logger.getLogger(ConnectUtil.class);
 
