@@ -12,8 +12,9 @@ public class DBSync {
         String confFileName = "resources/conf.properties";
         JobManager jobManager = new JobManager();
 
-        jobManager.config(confFileName);
-        jobManager.readJobConf();
+        jobManager.init(confFileName);
+        jobManager.connect();
+        jobManager.addAll();
         jobManager.run();
     }
 }

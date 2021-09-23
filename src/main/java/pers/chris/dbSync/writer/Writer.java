@@ -1,8 +1,11 @@
 package pers.chris.dbSync.writer;
 
+import pers.chris.dbSync.common.DBTypeEnum;
 import pers.chris.dbSync.conf.DBConf;
+import pers.chris.dbSync.job.JobTypeEnum;
 import pers.chris.dbSync.syncData.EventTypeEnum;
 import pers.chris.dbSync.syncData.SyncData;
+import pers.chris.dbSync.util.ClassLoadUtil;
 import pers.chris.dbSync.util.ConnectUtil;
 import pers.chris.dbSync.util.FieldUtil;
 import pers.chris.dbSync.util.SQLGenerateUtil;
@@ -11,7 +14,7 @@ import org.apache.log4j.Logger;
 import java.sql.*;
 import java.util.Map;
 
-public class Writer extends AbstractWriter {
+public class Writer extends BaseWriter {
 
     private DBConf writerConf;
     private Connection connection;
@@ -28,8 +31,8 @@ public class Writer extends AbstractWriter {
             DatabaseMetaData metaData = connection.getMetaData();
             ResultSet resultSet = metaData.getColumns(null, "%", getWriterConfig().getTableName(), "%");
             setFields(FieldUtil.read(resultSet));
-
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             e.printStackTrace();
         }
     }

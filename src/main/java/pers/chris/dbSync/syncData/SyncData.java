@@ -2,7 +2,7 @@ package pers.chris.dbSync.syncData;
 
 import pers.chris.dbSync.conf.SyncDataConf;
 import org.apache.log4j.Logger;
-import pers.chris.dbSync.fieldMapper.FieldMapManager;
+import pers.chris.dbSync.fieldMap.FieldMapManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,6 +12,8 @@ public class SyncData {
     private EventTypeEnum eventType;
     private SyncDataConf syncDataConf;
     private Map<String, String> rows;
+    private Map<String, String> writeFields;
+    private Map<String, String> readFields;
     private FieldMapManager fieldMapManager;
     private SyncDataListener syncDataListener;
     private final Logger logger = Logger.getLogger(SyncData.class);
@@ -20,14 +22,17 @@ public class SyncData {
         rows = new HashMap<>();
     }
 
-    public void setRows(Map<String, String> rows) {
-//        this.rows = rows;
-        this.rows = fieldMap(rows);
+    public void run(Map<String, String> rows) {
+        this.rows = rows;
+        fieldMap();
+
         syncDataListener.doSet(new SyncDataEvent(this));
     }
 
-    private Map<String, String> fieldMap (Map<String, String> rows) {
-        return fieldMapManager.run(rows);
+    // 字段映射
+    private void fieldMap () {
+        fieldMapManager.ensureField(writeFields, readFields);
+        rows = fieldMapManager.run(rows);
     }
 
     public void registerListener(SyncDataListener syncDataListener) {
@@ -67,6 +72,26 @@ public class SyncData {
 
     public Map<String, String> getRows() {
         return rows;
+    }
+
+    public void setRows(Map<String, String> rows) {
+        this.rows = rows;
+    }
+
+    public Map<String, String> getWriteFields() {
+        return writeFields;
+    }
+
+    public void setWriteFields(Map<String, String> writeFields) {
+        this.writeFields = writeFields;
+    }
+
+    public Map<String, String> getReadFields() {
+        return readFields;
+    }
+
+    public void setReadFields(Map<String, String> readFields) {
+        this.readFields = readFields;
     }
 
     public FieldMapManager getFieldMapManager() {

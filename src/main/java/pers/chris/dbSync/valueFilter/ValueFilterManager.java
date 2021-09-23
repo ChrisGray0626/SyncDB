@@ -6,14 +6,21 @@ import java.util.List;
 public class ValueFilterManager {
 
     private final List<ValueFilter> valueFilters;
-    private List<String> rules;
 
     public ValueFilterManager (List<String> rules) {
         valueFilters = new ArrayList<>();
-        this.rules = rules;
+        load(rules.toArray(new String[0]));
     }
 
-    public void config() {
+    public void add(String rule) {
+        load(rule);
+    }
+
+    public void addAll(List<String> rules) {
+        load(rules.toArray(new String[0]));
+    }
+
+    private void load(String... rules) {
         for (String rule: rules) {
             valueFilters.add(new ValueFilter(rule));
         }
@@ -26,17 +33,10 @@ public class ValueFilterManager {
 
         StringBuilder SQL = new StringBuilder();
         for (ValueFilter valueFilter: valueFilters) {
-            SQL.append(" and ").append(valueFilter.getRule());
+            SQL.append(valueFilter.getRule())
+                    .append(" and ");
         }
         return SQL.toString();
-    }
-
-    public List<String> getRules() {
-        return rules;
-    }
-
-    public void setRules(List<String> rules) {
-        this.rules = rules;
     }
 
 }

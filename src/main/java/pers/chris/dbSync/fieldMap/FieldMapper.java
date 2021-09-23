@@ -1,9 +1,6 @@
-package pers.chris.dbSync.fieldMapper;
+package pers.chris.dbSync.fieldMap;
 
 import org.apache.log4j.Logger;
-import pers.chris.dbSync.common.FieldTypeEnum;
-import pers.chris.dbSync.exception.FieldMapException;
-import pers.chris.dbSync.util.FieldUtil;
 
 import java.util.ArrayList;
 import java.util.Formatter;
@@ -13,12 +10,14 @@ import java.util.Map;
 public class FieldMapper {
 
     private String rule; // 映射规则
-    private List<String> dstFields; // 目标字段
-    private List<String> srcFields; // 源字段
+    private List<String> dstFieldNames; // 目标字段
+    private List<String> srcFieldNames; // 源字段
     private final Logger logger = Logger.getLogger(FieldMapper.class);
 
+
+
     public Map<String, String> map(Map<String, String> rows) {
-            if (dstFields.size() == 1) {
+            if (dstFieldNames.size() == 1) {
                 rows = multi2One(rows);
             }
         return rows;
@@ -26,10 +25,10 @@ public class FieldMapper {
 
     // 多对一关系映射
     public Map<String, String> multi2One(Map<String, String> rows) {
-        String dstField = dstFields.get(0);
+        String dstField = dstFieldNames.get(0);
         List<String> srcValues = new ArrayList<>();
 
-        for (String srcField: srcFields) {
+        for (String srcField: srcFieldNames) {
             srcValues.add(rows.get(srcField));
         }
 
@@ -39,7 +38,7 @@ public class FieldMapper {
         String dstValue = formatter.toString();
 
         // 移除源字段
-        for (String srcField: srcFields) {
+        for (String srcField: srcFieldNames) {
             rows.remove(srcField);
         }
 
@@ -56,20 +55,20 @@ public class FieldMapper {
         this.rule = rule;
     }
 
-    public List<String> getDstFields() {
-        return dstFields;
+    public List<String> getDstFieldNames() {
+        return dstFieldNames;
     }
 
-    public void setDstFields(List<String> dstFields) {
-        this.dstFields = dstFields;
+    public void setDstFieldNames(List<String> dstFieldNames) {
+        this.dstFieldNames = dstFieldNames;
     }
 
-    public List<String> getSrcFields() {
-        return srcFields;
+    public List<String> getSrcFieldNames() {
+        return srcFieldNames;
     }
 
-    public void setSrcFields(List<String> srcFields) {
-        this.srcFields = srcFields;
+    public void setSrcFieldNames(List<String> srcFieldNames) {
+        this.srcFieldNames = srcFieldNames;
     }
 
 }

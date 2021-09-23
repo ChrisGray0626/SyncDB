@@ -23,46 +23,55 @@ import java.util.regex.Pattern;
 
 public class ResultSetParseUtil {
 
-    private ResultSetParseUtil() {}
+    private ResultSetParseUtil() {
+    }
 
     private static final Logger logger = Logger.getLogger(Writer.class);
 
-    public static List<Job> parseJobConf(ResultSet resultSet) {
+    public static Job parseJob(ResultSet resultSet) {
+        Job job = new Job();
+        SyncDataConf syncDataConf = new SyncDataConf();
+        DBConf writerConf = new DBConf();
+        DBConf readerConf = new DBConf();
+
+        try {
+            job.setJobId(resultSet.getString("job_id"));
+            job.jobType = JobTypeEnum.valueOf(resultSet.getString("job_type"));
+
+            syncDataConf.setInterval(Integer.parseInt(resultSet.getString("sync_interval")));
+            syncDataConf.setTimeField(resultSet.getString("sync_time_field_name"));
+            writerConf.dbType = DBTypeEnum.valueOf(resultSet.getString("writer_db_type"));
+            writerConf.setHostname(resultSet.getString("writer_hostname"));
+            writerConf.setPort(resultSet.getString("writer_port"));
+            writerConf.setDBName(resultSet.getString("writer_db_name"));
+            writerConf.setUser(resultSet.getString("writer_user"));
+            writerConf.setPassword(resultSet.getString("writer_password"));
+            writerConf.setTableName(resultSet.getString("writer_table_name"));
+            readerConf.dbType = DBTypeEnum.valueOf(resultSet.getString("reader_db_type"));
+            readerConf.setHostname(resultSet.getString("reader_hostname"));
+            readerConf.setPort(resultSet.getString("reader_port"));
+            readerConf.setDBName(resultSet.getString("reader_db_name"));
+            readerConf.setUser(resultSet.getString("reader_user"));
+            readerConf.setPassword(resultSet.getString("reader_password"));
+            readerConf.setTableName(resultSet.getString("reader_table_name"));
+
+        } catch (SQLException e) {
+            logger.error(e);
+        }
+
+        job.setSyncDataConf(syncDataConf);
+        job.setWriterConf(writerConf);
+        job.setReaderConf(readerConf);
+
+        return job;
+    }
+
+    public static List<Job> parseJobs(ResultSet resultSet) {
         List<Job> jobs = new ArrayList<>();
 
         try {
             while (resultSet.next()) {
-                Job job = new Job();
-                SyncDataConf syncDataConf = new SyncDataConf();
-                DBConf writerConf = new DBConf();
-                DBConf readerConf = new DBConf();
-
-                job.setJobId(resultSet.getString("job_id"));
-                job.jobType = JobTypeEnum.valueOf(resultSet.getString("job_type"));
-
-                syncDataConf.setInterval(Integer.parseInt(resultSet.getString("sync_interval")));
-                syncDataConf.setTimeField(resultSet.getString("sync_time_field_name"));
-                List<String> fieldMapRules = new ArrayList<>();
-                writerConf.dbType = DBTypeEnum.valueOf(resultSet.getString("writer_db_type"));
-                writerConf.setHostname(resultSet.getString("writer_hostname"));
-                writerConf.setPort(resultSet.getString("writer_port"));
-                writerConf.setDBName(resultSet.getString("writer_db_name"));
-                writerConf.setUser(resultSet.getString("writer_user"));
-                writerConf.setPassword(resultSet.getString("writer_password"));
-                writerConf.setTableName(resultSet.getString("writer_table_name"));
-                readerConf.dbType = DBTypeEnum.valueOf(resultSet.getString("reader_db_type"));
-                readerConf.setHostname(resultSet.getString("reader_hostname"));
-                readerConf.setPort(resultSet.getString("reader_port"));
-                readerConf.setDBName(resultSet.getString("reader_db_name"));
-                readerConf.setUser(resultSet.getString("reader_user"));
-                readerConf.setPassword(resultSet.getString("reader_password"));
-                readerConf.setTableName(resultSet.getString("reader_table_name"));
-
-                job.setSyncDataConf(syncDataConf);
-                job.setWriterConf(writerConf);
-                job.setReaderConf(readerConf);
-
-                jobs.add(job);
+                jobs.add(parseJob(resultSet));
             }
         }
         catch (SQLException e) {
@@ -71,7 +80,20 @@ public class ResultSetParseUtil {
         return jobs;
     }
 
-    public static List<String> parseFieldMapConf (ResultSet resultSet) {
+    public static List<String> parseFieldMapConf(ResultSet resultSet) {
+        List<String> rules = new ArrayList<>();
+        try {
+            while (resultSet.next()) {
+                String rule = resultSet.getString("rule");
+                rules.add(rule);
+            }
+        } catch (SQLException e) {
+            logger.error(e);
+        }
+        return rules;
+    }
+
+    public static List<String> parseValueFilterConf(ResultSet resultSet) {
         List<String> rules = new ArrayList<>();
         try {
             while (resultSet.next()) {
@@ -85,33 +107,19 @@ public class ResultSetParseUtil {
         return rules;
     }
 
-    public static List<String> parseValueFilterConf (ResultSet resultSet) {
-        List<String> rules = new ArrayList<>();
-        try {
-            while (resultSet.next()) {
-                String rule = resultSet.getString("rule");
-                rules.add(rule);
-            }
-        }
-        catch (SQLException e) {
-            logger.error(e);
-        }
-        return rules;
-    }
-
-    // 解析常规（Pull方式）SQL
+    // 常规（Pull方式）SQL解析
     public static void parseGeneralSQL(ResultSet resultSet, SyncData syncData, List<String> fieldNames) {
         try {
             while (resultSet.next()) {
                 Map<String, String> rows = new HashMap<>();
 
                 // 根据字段名称获取对应数据
-                for (String fieldName: fieldNames) {
+                for (String fieldName : fieldNames) {
                     rows.put(fieldName, resultSet.getString(fieldName));
                 }
 
                 syncData.setEventType(EventTypeEnum.INSERT);
-                syncData.setRows(rows);
+                syncData.run(rows);
             }
         }
         catch (SQLException e) {
@@ -123,22 +131,19 @@ public class ResultSetParseUtil {
         List<List<String>> valuesData = new ArrayList<>();
 
         // 数据格式转换
-        for (Serializable[] valuesArr: values) {
+        for (Serializable[] valuesArr : values) {
             List<String> list = new ArrayList<>();
-            for (Serializable value: valuesArr) {
+            for (Serializable value : valuesArr) {
                 if (value != null) {
                     // TODO 中文编码问题
                     if (value.equals("瀹氭椂鏁版嵁")) {
                         list.add("定时数据");
-                    }
-                    else if (value.equals("澧為噺鏁版嵁")) {
+                    } else if (value.equals("澧為噺鏁版嵁")) {
                         list.add("增量数据");
-                    }
-                    else {
+                    } else {
                         list.add(value.toString());
                     }
-                }
-                else {
+                } else {
                     list.add("");
                 }
             }
@@ -177,13 +182,14 @@ public class ResultSetParseUtil {
                             values.add(matcher.group().replace("'", ""));
                         }
                         syncData.setEventType(eventType);
-                        syncData.setRows(FieldUtil.mergeFieldAndValue(fieldNames, values));
+                        syncData.run(FieldUtil.mergeFieldAndValue(fieldNames, values));
                         break;
                     default:
                         break;
                 }
             }
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             logger.error(e);
         }
     }
@@ -198,11 +204,11 @@ public class ResultSetParseUtil {
                         Map<String, String> rows = new HashMap<>();
 
                         // 根据字段名称获取对应数据
-                        for (String fieldName: fieldNames) {
+                        for (String fieldName : fieldNames) {
                             rows.put(fieldName, resultSet.getString(fieldName));
                         }
                         syncData.setEventType(curEventType);
-                        syncData.setRows(rows);
+                        syncData.run(rows);
                         break;
                     default:
                         break;

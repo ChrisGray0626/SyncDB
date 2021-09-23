@@ -65,7 +65,7 @@ public class MySQLReader extends Reader {
 
                     syncData.setEventType(EventTypeEnum.INSERT);
                     for (List<String> values: valuesData) {
-                        syncData.setRows(FieldUtil.mergeFieldAndValue(getFieldNames(), values));
+                        syncData.run(FieldUtil.mergeFieldAndValue(getFieldNames(), values));
                     }
                 }
             }

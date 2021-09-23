@@ -2,17 +2,14 @@ package pers.chris.dbSync.reader;
 
 import pers.chris.dbSync.conf.DBConf;
 import pers.chris.dbSync.syncData.SyncData;
-import pers.chris.dbSync.util.ConnectUtil;
-import pers.chris.dbSync.util.FieldUtil;
-import pers.chris.dbSync.util.ResultSetParseUtil;
-import pers.chris.dbSync.util.TimeUtil;
+import pers.chris.dbSync.util.*;
 import org.apache.log4j.Logger;
 import pers.chris.dbSync.valueFilter.ValueFilterManager;
 
 import java.sql.*;
 import java.util.concurrent.TimeUnit;
 
-public class Reader extends AbstractReader{
+public class Reader extends BaseReader {
 
     private DBConf readerConf;
     private ValueFilterManager valueFilterManager;
@@ -22,7 +19,6 @@ public class Reader extends AbstractReader{
     @Override
     public void connect() {
         connection = ConnectUtil.connect(getReaderConfig().dbType, getReaderConfig().getUrl(), getReaderConfig().getUser(), getReaderConfig().getPassword());
-        assert connection != null;
     }
 
     // 读取字段信息（名字、类型）
@@ -38,17 +34,21 @@ public class Reader extends AbstractReader{
         }
     }
 
+    // 数据过滤位置
     @Override
     public void read(SyncData syncData, Integer interval) {
-        String timeFieldName = syncData.getSyncDataConfig().getTimeField();
+        String timeFieldName = syncData.getSyncDataConfig().getTimeField(); //时间字段
         while (true) {
             try {
-                String time = TimeUtil.intervalTime(interval); // 当前时间
+                // 时间过滤
+                String curTime = TimeUtil.intervalTime(interval); // 当前时间
+                String timeFilterSQL = SQLGenerateUtil.timeFilterSQL(timeFieldName, curTime); // 时间过滤语句
+                String valueFilterSQL = valueFilterManager.filterSQL() + timeFilterSQL;
+
                 Statement statement = connection.createStatement();
                 ResultSet resultSet = statement.executeQuery(
                         "select * from " + getReaderConfig().getTableName()
-                                + " where " + timeFieldName + ">=" + time
-                                + valueFilterManager.filterSQL());
+                                + " where " + valueFilterSQL);
                 ResultSetParseUtil.parseGeneralSQL(resultSet, syncData, getFieldNames());
             } catch (SQLException e) {
                 logger.error(e);

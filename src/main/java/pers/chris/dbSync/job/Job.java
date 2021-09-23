@@ -2,11 +2,12 @@ package pers.chris.dbSync.job;
 
 import pers.chris.dbSync.conf.DBConf;
 import pers.chris.dbSync.conf.SyncDataConf;
-import pers.chris.dbSync.fieldMapper.FieldMapManager;
+import pers.chris.dbSync.fieldMap.FieldMapManager;
+import pers.chris.dbSync.reader.BaseReader;
 import pers.chris.dbSync.reader.Reader;
 import pers.chris.dbSync.syncData.SyncData;
-import pers.chris.dbSync.util.ClassLoadUtil;
 import pers.chris.dbSync.valueFilter.ValueFilterManager;
+import pers.chris.dbSync.writer.BaseWriter;
 import pers.chris.dbSync.writer.Writer;
 import org.apache.log4j.Logger;
 
@@ -20,57 +21,36 @@ public class Job implements Runnable {
     private ValueFilterManager valueFilterManager;
     private FieldMapManager fieldMapManager;
     private SyncData syncData;
-    private Writer writer;
-    private Reader reader;
     private final Logger logger = Logger.getLogger(Job.class);
 
     @Override
     public void run() {
         syncData = new SyncData();
-
-        try {
-            switch (jobType) {
-                case PUSH:
-                    reader = ClassLoadUtil.loadReaderClass(readerConf.dbType);
-                    break;
-                case PULL:
-                    reader = new Reader();
-                    break;
-                default:
-            }
-            writer = ClassLoadUtil.loadWriterClass(writerConf.dbType);
-        }
-        catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-            logger.error(e);
-        }
+        Writer writer = BaseWriter.getInstance(jobType, writerConf.dbType);
+        Reader reader = BaseReader.getInstance(jobType, readerConf.dbType);
 
         syncData.setSyncDataConfig(syncDataConf);
         writer.setWriterConfig(writerConf);
         reader.setReaderConfig(readerConf);
 
+        // 监听器注册，数据发生变化时执行方法write
         syncData.registerListener(event -> {
             writer.write(syncData);
         });
         writer.connect();
         reader.connect();
 
-        // 读取字段信息
+        // 字段信息读取&传入
         writer.readField();
         reader.readField();
+        syncData.setWriteFields(writer.getFields());
+        syncData.setReadFields(reader.getFields());
 
-        // 配置&加载数据过滤管理器
-        valueFilterManager.config();
+        // 数据过滤管理器&字段映射管理器传入
         reader.setValueFilterManager(valueFilterManager);
-
-        // 配置&检查&加载字段映射管理器
-        fieldMapManager.config();
-        fieldMapManager.check(writer.getFieldNames(), reader.getFieldNames());
         syncData.setFieldMapManager(fieldMapManager);
+
         reader.read(syncData, syncDataConf.getInterval());
-    }
-
-    private void runByPull() {
-
     }
 
     public String getJobId() {

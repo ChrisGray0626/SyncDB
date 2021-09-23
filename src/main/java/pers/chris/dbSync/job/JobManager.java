@@ -1,6 +1,6 @@
 package pers.chris.dbSync.job;
 
-import pers.chris.dbSync.fieldMapper.FieldMapManager;
+import pers.chris.dbSync.fieldMap.FieldMapManager;
 import pers.chris.dbSync.util.ConnectUtil;
 import pers.chris.dbSync.common.DBTypeEnum;
 import org.apache.log4j.Logger;
@@ -36,7 +36,7 @@ public class JobManager {
         jobs = new ArrayList<>();
     }
 
-    public void config (String fileName) {
+    public void init(String fileName) {
         Properties properties = new Properties();
         try {
             properties.load(new FileInputStream(fileName));
@@ -55,29 +55,36 @@ public class JobManager {
         valueFilterConfTableName = properties.getProperty("conf.valueFilterConfTableName");
     }
 
-    private void connect() {
+    public void connect() {
         String url = ConnectUtil.getUrl(dbType, hostname, port, dbName);
         connection = ConnectUtil.connect(dbType, url, user, password);
     }
 
-    public void readJobConf() {
-        connect();
+    public void add(String jobId) {
+        try {
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(
+                    "select * from " + syncJobConfTableName
+                            + " Where job_id=" + jobId);
+            jobs.add(ResultSetParseUtil.parseJob(resultSet));
+        } catch (SQLException e) {
+            logger.error(e);
+        }
+    }
 
+    public void addAll() {
         try {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(
                     "select * from " + syncJobConfTableName);
-            jobs = ResultSetParseUtil.parseJobConf(resultSet);
+            jobs = ResultSetParseUtil.parseJobs(resultSet);
         } catch (SQLException e) {
             logger.error(e);
         }
-
-        close();
     }
 
-    public List<String> readValueFilterConf(String jobId) {
+    public List<String> readValueFilterRule(String jobId) {
         List<String> rules = new ArrayList<>();
-        connect();
 
         try {
             Statement statement = connection.createStatement();
@@ -88,14 +95,11 @@ public class JobManager {
         } catch (SQLException e) {
             logger.error(e);
         }
-
-        close();
         return rules;
     }
 
-    public List<String> readFieldMapConf(String jobId) {
+    public List<String> readFieldMapRule(String jobId) {
         List<String> rules = new ArrayList<>();
-        connect();
 
         try {
             Statement statement = connection.createStatement();
@@ -106,8 +110,6 @@ public class JobManager {
         } catch (SQLException e) {
             logger.debug(e);
         }
-
-        close();
         return rules;
     }
 
@@ -115,10 +117,15 @@ public class JobManager {
         for (Job job : jobs) {
             String jobId = job.getJobId();
 
-            List<String> valueFilterRules = readValueFilterConf(jobId);
-            List<String> fieldMapRules = readFieldMapConf(jobId);
+            // 数据过滤管理器&字段映射管理器读取&加载&传入根据JobId
+            connect();
+            List<String> valueFilterRules = readValueFilterRule(jobId);
+            List<String> fieldMapRules = readFieldMapRule(jobId);
+            close();
+
             ValueFilterManager valueFilterManager = new ValueFilterManager(valueFilterRules);
             FieldMapManager fieldMapManager = new FieldMapManager(fieldMapRules);
+
             job.setValueFilterManager(valueFilterManager);
             job.setFieldMapManager(fieldMapManager);
 
