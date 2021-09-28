@@ -1,6 +1,6 @@
 package pers.chris.dbSync.util;
 
-import pers.chris.dbSync.common.DBTypeEnum;
+import pers.chris.dbSync.common.typeEnum.DBTypeEnum;
 import org.apache.log4j.Logger;
 
 import java.sql.Connection;
@@ -29,12 +29,14 @@ public class ConnectUtil {
         } catch (ClassNotFoundException e) {
             logger.error(e);
         }
+
+        Connection connection = null;
         try {
-            return DriverManager.getConnection(url, user, password);
+            connection = DriverManager.getConnection(url, user, password);
         } catch (SQLException e) {
             logger.error(e);
         }
-        return null;
+        return connection;
     }
 
     public static String getUrl(DBTypeEnum dbType, String hostname, String port, String dbName) {

@@ -1,8 +1,10 @@
 package pers.chris.dbSync.util;
 
+import pers.chris.dbSync.reader.BaseReader;
 import pers.chris.dbSync.reader.Reader;
+import pers.chris.dbSync.writer.BaseWriter;
 import pers.chris.dbSync.writer.Writer;
-import pers.chris.dbSync.common.DBTypeEnum;
+import pers.chris.dbSync.common.typeEnum.DBTypeEnum;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +24,7 @@ public class ClassLoadUtil {
     }
 
     public static Writer loadWriterClass(DBTypeEnum dbType) {
-        String basePath = Writer.class.getPackage().getName();
+        String basePath = BaseWriter.class.getPackage().getName();
         String classPath = basePath + "." + map.get(dbType) + "Writer";
         Writer writer = null;
 
@@ -35,7 +37,7 @@ public class ClassLoadUtil {
     }
 
     public static Reader loadReaderClass(DBTypeEnum dbType) {
-        String basePath = Reader.class.getPackage().getName();
+        String basePath = BaseReader.class.getPackage().getName();
         String classPath = basePath + "." + map.get(dbType) + "Reader";
         Reader reader = null;
 

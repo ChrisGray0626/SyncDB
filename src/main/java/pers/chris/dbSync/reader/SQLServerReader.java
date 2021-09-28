@@ -2,7 +2,7 @@ package pers.chris.dbSync.reader;
 
 import pers.chris.dbSync.syncData.SyncData;
 import pers.chris.dbSync.util.ResultSetParseUtil;
-import pers.chris.dbSync.common.DBTypeEnum;
+import pers.chris.dbSync.common.typeEnum.DBTypeEnum;
 import org.apache.log4j.Logger;
 
 import java.sql.*;

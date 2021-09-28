@@ -3,6 +3,7 @@ package pers.chris.dbSync.fieldMap;
 
 import org.apache.log4j.Logger;
 import pers.chris.dbSync.exception.FieldMapException;
+import pers.chris.dbSync.syncData.SyncData;
 import pers.chris.dbSync.util.FieldUtil;
 
 import java.util.ArrayList;
@@ -63,11 +64,24 @@ public class FieldMapManager {
         }
     }
 
+    @Deprecated
     public Map<String, String> run(Map<String, String> rows) {
         for (FieldMapper fieldMapper : fieldMappers) {
             fieldMapper.map(rows);
         }
         return rows;
+    }
+
+    public void run(SyncData syncData) {
+        ensureField(syncData.getWriteFields(), syncData.getReadFields());
+
+        Map<String, String> data = syncData.getData();
+
+        for (FieldMapper fieldMapper : fieldMappers) {
+            fieldMapper.map(data);
+        }
+
+        syncData.setData(data);
     }
 
 }

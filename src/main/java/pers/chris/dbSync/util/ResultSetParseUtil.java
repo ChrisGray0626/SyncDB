@@ -1,11 +1,11 @@
 package pers.chris.dbSync.util;
 
-import pers.chris.dbSync.common.DBTypeEnum;
+import pers.chris.dbSync.common.typeEnum.DBTypeEnum;
 import pers.chris.dbSync.conf.DBConf;
 import pers.chris.dbSync.conf.SyncDataConf;
 import pers.chris.dbSync.job.Job;
-import pers.chris.dbSync.job.JobTypeEnum;
-import pers.chris.dbSync.syncData.EventTypeEnum;
+import pers.chris.dbSync.common.typeEnum.JobTypeEnum;
+import pers.chris.dbSync.common.typeEnum.EventTypeEnum;
 import pers.chris.dbSync.syncData.SyncData;
 import pers.chris.dbSync.writer.Writer;
 import org.apache.log4j.Logger;
@@ -30,38 +30,20 @@ public class ResultSetParseUtil {
 
     public static Job parseJob(ResultSet resultSet) {
         Job job = new Job();
-        SyncDataConf syncDataConf = new SyncDataConf();
-        DBConf writerConf = new DBConf();
-        DBConf readerConf = new DBConf();
 
         try {
             job.setJobId(resultSet.getString("job_id"));
             job.jobType = JobTypeEnum.valueOf(resultSet.getString("job_type"));
-
+            job.setSrcDBConfId(resultSet.getString("src_db_conf_id"));
+            job.setDstDBConfId(resultSet.getString("dst_db_conf_id"));
+            SyncDataConf syncDataConf = new SyncDataConf();
             syncDataConf.setInterval(Integer.parseInt(resultSet.getString("sync_interval")));
             syncDataConf.setTimeField(resultSet.getString("sync_time_field_name"));
-            writerConf.dbType = DBTypeEnum.valueOf(resultSet.getString("writer_db_type"));
-            writerConf.setHostname(resultSet.getString("writer_hostname"));
-            writerConf.setPort(resultSet.getString("writer_port"));
-            writerConf.setDBName(resultSet.getString("writer_db_name"));
-            writerConf.setUser(resultSet.getString("writer_user"));
-            writerConf.setPassword(resultSet.getString("writer_password"));
-            writerConf.setTableName(resultSet.getString("writer_table_name"));
-            readerConf.dbType = DBTypeEnum.valueOf(resultSet.getString("reader_db_type"));
-            readerConf.setHostname(resultSet.getString("reader_hostname"));
-            readerConf.setPort(resultSet.getString("reader_port"));
-            readerConf.setDBName(resultSet.getString("reader_db_name"));
-            readerConf.setUser(resultSet.getString("reader_user"));
-            readerConf.setPassword(resultSet.getString("reader_password"));
-            readerConf.setTableName(resultSet.getString("reader_table_name"));
-
+            job.setSyncDataConf(syncDataConf);
         } catch (SQLException e) {
             logger.error(e);
         }
 
-        job.setSyncDataConf(syncDataConf);
-        job.setWriterConf(writerConf);
-        job.setReaderConf(readerConf);
 
         return job;
     }
@@ -78,6 +60,23 @@ public class ResultSetParseUtil {
             logger.error(e);
         }
         return jobs;
+    }
+
+    public static DBConf parseDBConf(ResultSet resultSet) {
+        DBConf dbConf = new DBConf();
+        try {
+            resultSet.next();
+            dbConf.dbType = DBTypeEnum.valueOf(resultSet.getString("db_type"));
+            dbConf.setHostname(resultSet.getString("hostname"));
+            dbConf.setPort(resultSet.getString("port"));
+            dbConf.setDBName(resultSet.getString("db_name"));
+            dbConf.setUser(resultSet.getString("user"));
+            dbConf.setPassword(resultSet.getString("password"));
+            dbConf.setTableName(resultSet.getString("table_name"));
+        } catch (SQLException e) {
+            logger.error(e);
+        }
+        return dbConf;
     }
 
     public static List<String> parseFieldMapConf(ResultSet resultSet) {
@@ -111,15 +110,16 @@ public class ResultSetParseUtil {
     public static void parseGeneralSQL(ResultSet resultSet, SyncData syncData, List<String> fieldNames) {
         try {
             while (resultSet.next()) {
-                Map<String, String> rows = new HashMap<>();
+                Map<String, String> data = new HashMap<>();
 
                 // 根据字段名称获取对应数据
                 for (String fieldName : fieldNames) {
-                    rows.put(fieldName, resultSet.getString(fieldName));
+                    data.put(fieldName, resultSet.getString(fieldName));
                 }
 
                 syncData.setEventType(EventTypeEnum.INSERT);
-                syncData.run(rows);
+                syncData.setData(data);
+                syncData.trigger();
             }
         }
         catch (SQLException e) {
@@ -182,7 +182,8 @@ public class ResultSetParseUtil {
                             values.add(matcher.group().replace("'", ""));
                         }
                         syncData.setEventType(eventType);
-                        syncData.run(FieldUtil.mergeFieldAndValue(fieldNames, values));
+                        syncData.setData(FieldUtil.mergeFieldAndValue(fieldNames, values));
+                        syncData.trigger();
                         break;
                     default:
                         break;
@@ -208,7 +209,7 @@ public class ResultSetParseUtil {
                             rows.put(fieldName, resultSet.getString(fieldName));
                         }
                         syncData.setEventType(curEventType);
-                        syncData.run(rows);
+                        syncData.setData(rows);
                         break;
                     default:
                         break;

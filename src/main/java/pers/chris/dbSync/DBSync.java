@@ -14,7 +14,7 @@ public class DBSync {
 
         jobManager.init(confFileName);
         jobManager.connect();
-        jobManager.addAll();
+        jobManager.load();
         jobManager.run();
     }
 }

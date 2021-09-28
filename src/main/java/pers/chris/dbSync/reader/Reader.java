@@ -7,7 +7,6 @@ import org.apache.log4j.Logger;
 import pers.chris.dbSync.valueFilter.ValueFilterManager;
 
 import java.sql.*;
-import java.util.concurrent.TimeUnit;
 
 public class Reader extends BaseReader {
 
@@ -38,28 +37,23 @@ public class Reader extends BaseReader {
     @Override
     public void read(SyncData syncData, Integer interval) {
         String timeFieldName = syncData.getSyncDataConfig().getTimeField(); //时间字段
-        while (true) {
-            try {
-                // 时间过滤
-                String curTime = TimeUtil.intervalTime(interval); // 当前时间
-                String timeFilterSQL = SQLGenerateUtil.timeFilterSQL(timeFieldName, curTime); // 时间过滤语句
-                String valueFilterSQL = valueFilterManager.filterSQL() + timeFilterSQL;
+        // 时间过滤
+        String curTime = TimeUtil.intervalTime(interval); // 当前时间
+        String timeFilterSQL = SQLGenerateUtil.timeFilterSQL(timeFieldName, curTime); // 时间过滤语句
+        String valueFilterSQL = valueFilterManager.filterSQL() + timeFilterSQL;
 
-                Statement statement = connection.createStatement();
-                ResultSet resultSet = statement.executeQuery(
-                        "select * from " + getReaderConfig().getTableName()
-                                + " where " + valueFilterSQL);
-                ResultSetParseUtil.parseGeneralSQL(resultSet, syncData, getFieldNames());
-            } catch (SQLException e) {
-                logger.error(e);
-            }
-
-            try {
-                TimeUnit.MINUTES.sleep(interval);
-            } catch (InterruptedException e) {
-                logger.error(e);
-            }
+        try {
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(
+                    "select * from " + getReaderConfig().getTableName()
+                            + " where " + valueFilterSQL);
+            ResultSetParseUtil.parseGeneralSQL(resultSet, syncData, getFieldNames());
         }
+        catch (SQLException e) {
+            logger.error(e);
+        }
+
+
     }
 
     @Override

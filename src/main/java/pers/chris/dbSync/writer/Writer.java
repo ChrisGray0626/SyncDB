@@ -1,11 +1,8 @@
 package pers.chris.dbSync.writer;
 
-import pers.chris.dbSync.common.DBTypeEnum;
 import pers.chris.dbSync.conf.DBConf;
-import pers.chris.dbSync.job.JobTypeEnum;
-import pers.chris.dbSync.syncData.EventTypeEnum;
+import pers.chris.dbSync.common.typeEnum.EventTypeEnum;
 import pers.chris.dbSync.syncData.SyncData;
-import pers.chris.dbSync.util.ClassLoadUtil;
 import pers.chris.dbSync.util.ConnectUtil;
 import pers.chris.dbSync.util.FieldUtil;
 import pers.chris.dbSync.util.SQLGenerateUtil;
@@ -39,16 +36,10 @@ public class Writer extends BaseWriter {
 
     @Override
     public synchronized void write(SyncData syncData) {
-        Map<String, String> rows = syncData.getRows();
+        Map<String, String> rows = syncData.getData();
         EventTypeEnum eventType = syncData.getEventType();
 
-        String SQL = null;
-        switch (eventType) {
-            case INSERT:
-                SQL = SQLGenerateUtil.insertSQL(getWriterConfig().getTableName(), rows);
-                break;
-            default:
-        }
+        String SQL = SQLGenerateUtil.insertSQL(getWriterConfig().getTableName(), rows);
 
         try {
             Statement statement = connection.createStatement();

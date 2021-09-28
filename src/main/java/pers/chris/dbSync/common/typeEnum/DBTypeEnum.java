@@ -1,4 +1,4 @@
-package pers.chris.dbSync.common;
+package pers.chris.dbSync.common.typeEnum;
 
 public enum DBTypeEnum {
 

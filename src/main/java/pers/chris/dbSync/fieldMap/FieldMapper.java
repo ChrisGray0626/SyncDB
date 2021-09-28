@@ -14,8 +14,6 @@ public class FieldMapper {
     private List<String> srcFieldNames; // 源字段
     private final Logger logger = Logger.getLogger(FieldMapper.class);
 
-
-
     public Map<String, String> map(Map<String, String> rows) {
             if (dstFieldNames.size() == 1) {
                 rows = multi2One(rows);
@@ -27,7 +25,6 @@ public class FieldMapper {
     public Map<String, String> multi2One(Map<String, String> rows) {
         String dstField = dstFieldNames.get(0);
         List<String> srcValues = new ArrayList<>();
-
         for (String srcField: srcFieldNames) {
             srcValues.add(rows.get(srcField));
         }

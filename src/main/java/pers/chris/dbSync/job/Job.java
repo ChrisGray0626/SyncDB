@@ -1,5 +1,6 @@
 package pers.chris.dbSync.job;
 
+import pers.chris.dbSync.common.typeEnum.JobTypeEnum;
 import pers.chris.dbSync.conf.DBConf;
 import pers.chris.dbSync.conf.SyncDataConf;
 import pers.chris.dbSync.fieldMap.FieldMapManager;
@@ -11,46 +12,90 @@ import pers.chris.dbSync.writer.BaseWriter;
 import pers.chris.dbSync.writer.Writer;
 import org.apache.log4j.Logger;
 
+import java.util.concurrent.TimeUnit;
+
 public class Job implements Runnable {
 
     private String jobId;
     public JobTypeEnum jobType;
+    private String dstDBConfId;
+    private String srcDBConfId;
+    private DBConf dstDBConf;
+    private DBConf srcDBConf;
     private SyncDataConf syncDataConf;
-    private DBConf writerConf;
-    private DBConf readerConf;
     private ValueFilterManager valueFilterManager;
     private FieldMapManager fieldMapManager;
     private SyncData syncData;
+    private Reader reader;
+    private Writer writer;
     private final Logger logger = Logger.getLogger(Job.class);
 
     @Override
     public void run() {
+        // Job信息打印
+        console();
+
         syncData = new SyncData();
-        Writer writer = BaseWriter.getInstance(jobType, writerConf.dbType);
-        Reader reader = BaseReader.getInstance(jobType, readerConf.dbType);
+        reader = BaseReader.getInstance(jobType, srcDBConf.dbType);
+        writer = BaseWriter.getInstance(jobType, dstDBConf.dbType);
 
         syncData.setSyncDataConfig(syncDataConf);
-        writer.setWriterConfig(writerConf);
-        reader.setReaderConfig(readerConf);
+        reader.setReaderConfig(srcDBConf);
+        writer.setWriterConfig(dstDBConf);
 
-        // 监听器注册，数据发生变化时执行方法write
-        syncData.registerListener(event -> {
-            writer.write(syncData);
-        });
-        writer.connect();
         reader.connect();
+        writer.connect();
 
         // 字段信息读取&传入
-        writer.readField();
         reader.readField();
-        syncData.setWriteFields(writer.getFields());
+        writer.readField();
         syncData.setReadFields(reader.getFields());
+        syncData.setWriteFields(writer.getFields());
 
-        // 数据过滤管理器&字段映射管理器传入
+        // 数据过滤管理器传入，数据过滤在读取时完成
         reader.setValueFilterManager(valueFilterManager);
-        syncData.setFieldMapManager(fieldMapManager);
 
+        // 监听器注册，数据发生变化时执行后续流程
+        syncData.registerListener(event -> {
+            fieldMapManager.run(syncData);
+            writer.write(syncData);
+        });
+
+        switch (jobType) {
+            case TIMED:
+                runTimed();
+                break;
+            case REAL:
+                runReal();
+                break;
+            default:
+        }
+    }
+
+    public void runTimed() {
+        int interval = syncDataConf.getInterval();
+
+        while (true) {
+            reader.read(syncData, interval);
+            try {
+                TimeUnit.MINUTES.sleep(interval);
+            }
+            catch (InterruptedException e) {
+                logger.error(e);
+            }
+        }
+    }
+
+    public void runReal() {
         reader.read(syncData, syncDataConf.getInterval());
+    }
+
+    public void console() {
+        String jobInfo = "Job {"
+                + "DstDBType=" + dstDBConf.dbType
+                + ", SrcDBType=" + srcDBConf.dbType
+                + "}";
+        logger.debug(jobInfo);
     }
 
     public String getJobId() {
@@ -61,20 +106,36 @@ public class Job implements Runnable {
         this.jobId = jobId;
     }
 
-    public DBConf getWriterConf() {
-        return writerConf;
+    public String getDstDBConfId() {
+        return dstDBConfId;
     }
 
-    public void setWriterConf(DBConf writerConf) {
-        this.writerConf = writerConf;
+    public void setDstDBConfId(String dstDBConfId) {
+        this.dstDBConfId = dstDBConfId;
     }
 
-    public DBConf getReaderConf() {
-        return readerConf;
+    public String getSrcDBConfId() {
+        return srcDBConfId;
     }
 
-    public void setReaderConf(DBConf readerConf) {
-        this.readerConf = readerConf;
+    public void setSrcDBConfId(String srcDBConfId) {
+        this.srcDBConfId = srcDBConfId;
+    }
+
+    public DBConf getDstDBConf() {
+        return dstDBConf;
+    }
+
+    public void setDstDBConf(DBConf dstDBConf) {
+        this.dstDBConf = dstDBConf;
+    }
+
+    public DBConf getSrcDBConf() {
+        return srcDBConf;
+    }
+
+    public void setSrcDBConf(DBConf srcDBConf) {
+        this.srcDBConf = srcDBConf;
     }
 
     public SyncDataConf getSyncDataConf() {

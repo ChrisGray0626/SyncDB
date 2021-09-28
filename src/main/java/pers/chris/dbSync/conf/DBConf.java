@@ -1,6 +1,6 @@
 package pers.chris.dbSync.conf;
 
-import pers.chris.dbSync.common.DBTypeEnum;
+import pers.chris.dbSync.common.typeEnum.DBTypeEnum;
 import pers.chris.dbSync.util.ConnectUtil;
 
 public class DBConf {
@@ -65,4 +65,16 @@ public class DBConf {
         this.tableName = tableName;
     }
 
+    @Override
+    public String toString() {
+        return "DBConf{" +
+                "dbType=" + dbType +
+                ", hostname='" + hostname + '\'' +
+                ", port='" + port + '\'' +
+                ", user='" + user + '\'' +
+                ", password='" + password + '\'' +
+                ", dbName='" + dbName + '\'' +
+                ", tableName='" + tableName + '\'' +
+                '}';
+    }
 }

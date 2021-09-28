@@ -1,13 +1,13 @@
 package pers.chris.dbSync.reader;
 
-import pers.chris.dbSync.syncData.EventTypeEnum;
+import pers.chris.dbSync.common.typeEnum.EventTypeEnum;
 import pers.chris.dbSync.syncData.SyncData;
 import pers.chris.dbSync.util.FieldUtil;
 import pers.chris.dbSync.util.ResultSetParseUtil;
 import com.github.shyiko.mysql.binlog.BinaryLogClient;
 import com.github.shyiko.mysql.binlog.event.*;
 import com.github.shyiko.mysql.binlog.event.deserialization.EventDeserializer;
-import pers.chris.dbSync.common.DBTypeEnum;
+import pers.chris.dbSync.common.typeEnum.DBTypeEnum;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -61,11 +61,13 @@ public class MySQLReader extends Reader {
                         && getReaderConfig().getTableName().equals(curTableName[0])) {
                     WriteRowsEventData writeRowsEventData = (WriteRowsEventData) eventData;
 
+                    // 一次获取多条数据
                     List<List<String>> valuesData = ResultSetParseUtil.parseMySQLBinLogRows(writeRowsEventData.getRows());
 
                     syncData.setEventType(EventTypeEnum.INSERT);
                     for (List<String> values: valuesData) {
-                        syncData.run(FieldUtil.mergeFieldAndValue(getFieldNames(), values));
+                        syncData.setData(FieldUtil.mergeFieldAndValue(getFieldNames(), values));
+                        syncData.trigger();
                     }
                 }
             }

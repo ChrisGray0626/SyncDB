@@ -1,17 +1,22 @@
-# Readme
+## 同步流程
+
+```mermaid
+graph LR
+SrcDB --> Reader --> ValueFilter --> FieldMap --> Writer --> DstDB
+```
 
 ## 执行器（Executor）
 
 ### 读取执行器（Reader）
 
 - 统一的连接方法
-- 统一的读取方法（Pull）
+- 统一的读取方法（Timed）
 
 #### 数据过滤（Filter）
 
 - 编写过滤规则
 - 拼接SQL语句
-- 方法read执行时进行条件查询（Pull）
+- 方法read执行时进行条件查询（Timed）
 
 #### MySQLReader
 
@@ -148,29 +153,49 @@
 
 #### PostgreSQLWriter
 
+## 数据过滤（ValueFilter）
+
+- 过滤规则
+
+### 数据过滤管理器（ValueFilterManager）
+
+- 规则配置
+- 语句拼接
+- 管理运行
+- 数据过滤在读取时完成
+
 ## 同步数据集（SyncData）
 
 - 多线程安全：方法write加同步锁
 
-### 字段映射（FieldMap）
+### 监听器（SyncDataListener）
+
+- 专门的监听触发方法trigger，调用后将调用监听器的方法doSet。
+
+#### 数据格式
+
+- Map<String, String> data
+
+## 字段映射（FieldMap）
 
 - 源字段
 - 目标字段
-- 规则配置
-- 格式检查
+- 映射规则
 - 字段映射
 
-#### 字段映射管理器（FieldMapManager）
+### 字段映射管理器（FieldMapManager）
 
-- 配置多条字段规则
+- 规则配置
+- 格式检查
+- 管理运行
 
-#### 映射检查
+### 映射检查
 
 - 字段类型
 - 字段包含
 - 规则语法
 
-#### 规则语法
+### 规则语法
 
 - 字段均使用大括号表示
 - 目标字段在等号左侧
@@ -179,14 +204,6 @@
 ```properties
 {name}={first_name} {last_name}
 ```
-
-### 监听器（SyncDataListener）
-
-监听器建立在属性rows上，每次调用方法setRows后，将调用监听器的方法doSet。
-
-#### 数据格式
-
-Map<String, String> rows
 
 ## 作业（Job）
 
@@ -226,8 +243,8 @@ conf.valueFilterConfTableName = value_filter_conf
 
 #### 作业类型（JobType）
 
-- PULL
-- PUSH
+- REAL（实时）
+- TIMED（定时）
 
 #### 数据库类型（DBType）
 
@@ -238,6 +255,8 @@ conf.valueFilterConfTableName = value_filter_conf
 #### 事件类型（EventType）
 
 - INSERT
+- INCREMENTAL（增量）
+- TOTAL（全量）
 
 ## 日志（Log）
 
@@ -267,4 +286,3 @@ log4j.appender.Database.layout=org.apache.log4j.PatternLayout
 ## 注意事项
 
 - Writer/Reader必须与实现类放在同一package下，否则无法动态加载实现类。
-

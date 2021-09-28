@@ -1,8 +1,9 @@
 package pers.chris.dbSync.syncData;
 
+import pers.chris.dbSync.common.ProcedureEvent;
+import pers.chris.dbSync.common.typeEnum.EventTypeEnum;
 import pers.chris.dbSync.conf.SyncDataConf;
 import org.apache.log4j.Logger;
-import pers.chris.dbSync.fieldMap.FieldMapManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,28 +12,19 @@ import java.util.Map;
 public class SyncData {
     private EventTypeEnum eventType;
     private SyncDataConf syncDataConf;
-    private Map<String, String> rows;
+    private Map<String, String> data;
     private Map<String, String> writeFields;
     private Map<String, String> readFields;
-    private FieldMapManager fieldMapManager;
     private SyncDataListener syncDataListener;
     private final Logger logger = Logger.getLogger(SyncData.class);
 
     public SyncData() {
-        rows = new HashMap<>();
+        data = new HashMap<>();
     }
 
-    public void run(Map<String, String> rows) {
-        this.rows = rows;
-        fieldMap();
-
-        syncDataListener.doSet(new SyncDataEvent(this));
-    }
-
-    // 字段映射
-    private void fieldMap () {
-        fieldMapManager.ensureField(writeFields, readFields);
-        rows = fieldMapManager.run(rows);
+    // 触发后续操作
+    public void trigger() {
+        syncDataListener.doSet(new ProcedureEvent());
     }
 
     public void registerListener(SyncDataListener syncDataListener) {
@@ -40,18 +32,7 @@ public class SyncData {
     }
 
     public interface SyncDataListener {
-        void doSet(SyncDataEvent event);
-    }
-
-    public String toString() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("rows: [");
-        for (Map.Entry entry: rows.entrySet()) {
-            stringBuilder.append(entry.getValue()).append(",");
-        }
-            stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-            stringBuilder.append("]");
-        return stringBuilder.toString();
+        void doSet(ProcedureEvent event);
     }
 
     public EventTypeEnum getEventType() {
@@ -70,12 +51,12 @@ public class SyncData {
         this.syncDataConf = syncDataConf;
     }
 
-    public Map<String, String> getRows() {
-        return rows;
+    public Map<String, String> getData() {
+        return data;
     }
 
-    public void setRows(Map<String, String> rows) {
-        this.rows = rows;
+    public void setData(Map<String, String> data) {
+        this.data = data;
     }
 
     public Map<String, String> getWriteFields() {
@@ -94,13 +75,4 @@ public class SyncData {
         this.readFields = readFields;
     }
 
-    public FieldMapManager getFieldMapManager() {
-        return fieldMapManager;
-    }
-
-    public void setFieldMapManager(FieldMapManager fieldMapManager) {
-        this.fieldMapManager = fieldMapManager;
-    }
-
 }
-

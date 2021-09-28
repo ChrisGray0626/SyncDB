@@ -1,8 +1,9 @@
 package pers.chris.dbSync.job;
 
+import pers.chris.dbSync.conf.DBConf;
 import pers.chris.dbSync.fieldMap.FieldMapManager;
 import pers.chris.dbSync.util.ConnectUtil;
-import pers.chris.dbSync.common.DBTypeEnum;
+import pers.chris.dbSync.common.typeEnum.DBTypeEnum;
 import org.apache.log4j.Logger;
 import pers.chris.dbSync.util.ResultSetParseUtil;
 import pers.chris.dbSync.valueFilter.ValueFilterManager;
@@ -27,6 +28,7 @@ public class JobManager {
     private String user;
     private String password;
     private String syncJobConfTableName;
+    private String DBConfTableName;
     private String fieldMapConfTableName;
     private String valueFilterConfTableName;
     private Connection connection;
@@ -51,6 +53,7 @@ public class JobManager {
         user = properties.getProperty("conf.user");
         password = properties.getProperty("conf.password");
         syncJobConfTableName = properties.getProperty("conf.syncJobConfTableName");
+        DBConfTableName = properties.getProperty("conf.DBConfTableName");
         fieldMapConfTableName = properties.getProperty("conf.fieldMapConfTableName");
         valueFilterConfTableName = properties.getProperty("conf.valueFilterConfTableName");
     }
@@ -72,7 +75,7 @@ public class JobManager {
         }
     }
 
-    public void addAll() {
+    public void load() {
         try {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(
@@ -83,7 +86,22 @@ public class JobManager {
         }
     }
 
-    public List<String> readValueFilterRule(String jobId) {
+    private DBConf readDBConf(String confId) {
+        DBConf dbConf = null;
+
+        try {
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(
+                    "select * from " + DBConfTableName
+            + " where conf_id=" + confId);
+            dbConf = ResultSetParseUtil.parseDBConf(resultSet);
+        } catch (SQLException e) {
+            logger.error(e);
+        }
+        return dbConf;
+    }
+
+    private List<String> readValueFilterRule(String jobId) {
         List<String> rules = new ArrayList<>();
 
         try {
@@ -98,7 +116,7 @@ public class JobManager {
         return rules;
     }
 
-    public List<String> readFieldMapRule(String jobId) {
+    private List<String> readFieldMapRule(String jobId) {
         List<String> rules = new ArrayList<>();
 
         try {
@@ -113,28 +131,37 @@ public class JobManager {
         return rules;
     }
 
+    private void jobInit(Job job) {
+        String jobId = job.getJobId();
+        String srcDBConfId = job.getSrcDBConfId();
+        String dstDBConfId = job.getDstDBConfId();
+
+        // 源&目标数据库读取根据DBConfId
+        DBConf srcDBConf = readDBConf(srcDBConfId);
+        DBConf dstDBConf = readDBConf(dstDBConfId);
+
+        // 数据过滤管理器&字段映射管理器读取&加载根据JobId
+        List<String> valueFilterRules = readValueFilterRule(jobId);
+        List<String> fieldMapRules = readFieldMapRule(jobId);
+        ValueFilterManager valueFilterManager = new ValueFilterManager(valueFilterRules);
+        FieldMapManager fieldMapManager = new FieldMapManager(fieldMapRules);
+
+        job.setSrcDBConf(srcDBConf);
+        job.setDstDBConf(dstDBConf);
+        job.setValueFilterManager(valueFilterManager);
+        job.setFieldMapManager(fieldMapManager);
+    }
+
     public void run() {
         for (Job job : jobs) {
-            String jobId = job.getJobId();
-
-            // 数据过滤管理器&字段映射管理器读取&加载&传入根据JobId
-            connect();
-            List<String> valueFilterRules = readValueFilterRule(jobId);
-            List<String> fieldMapRules = readFieldMapRule(jobId);
-            close();
-
-            ValueFilterManager valueFilterManager = new ValueFilterManager(valueFilterRules);
-            FieldMapManager fieldMapManager = new FieldMapManager(fieldMapRules);
-
-            job.setValueFilterManager(valueFilterManager);
-            job.setFieldMapManager(fieldMapManager);
+            jobInit(job);
 
             Thread jobThead = new Thread(job);
             jobThead.start();
         }
     }
 
-    private void close() {
+    public void close() {
         try {
             connection.close();
         } catch (SQLException e) {

@@ -76,11 +76,11 @@ public class FieldUtil {
 
     // 字段与值合并
     public static Map<String, String> mergeFieldAndValue(List<String> fields, List<String> values) {
-        Map<String, String> rows = new HashMap<>();
+        Map<String, String> data = new HashMap<>();
         for (int i = 0; i < fields.size(); i++) {
-            rows.put(fields.get(i), values.get(i));
+            data.put(fields.get(i), values.get(i));
         }
-        return rows;
+        return data;
     }
 
     // 字段名检查

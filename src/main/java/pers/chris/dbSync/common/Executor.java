@@ -1,6 +1,8 @@
 package pers.chris.dbSync.common;
 
 
+import pers.chris.dbSync.common.typeEnum.DBTypeEnum;
+
 import java.util.*;
 
 public abstract class Executor {
