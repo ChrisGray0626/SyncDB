@@ -1,7 +1,5 @@
 package pers.chris.dbSync.reader;
 
-import pers.chris.dbSync.common.ProcedureEvent;
-import pers.chris.dbSync.common.ProcedureListener;
 import pers.chris.dbSync.common.typeEnum.DBTypeEnum;
 import pers.chris.dbSync.common.Readable;
 import pers.chris.dbSync.common.Executor;

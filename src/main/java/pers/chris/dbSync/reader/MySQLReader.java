@@ -3,7 +3,6 @@ package pers.chris.dbSync.reader;
 import pers.chris.dbSync.common.typeEnum.EventTypeEnum;
 import pers.chris.dbSync.syncData.SyncData;
 import pers.chris.dbSync.util.FieldUtil;
-import pers.chris.dbSync.util.ResultSetParseUtil;
 import com.github.shyiko.mysql.binlog.BinaryLogClient;
 import com.github.shyiko.mysql.binlog.event.*;
 import com.github.shyiko.mysql.binlog.event.deserialization.EventDeserializer;
@@ -11,6 +10,8 @@ import pers.chris.dbSync.common.typeEnum.DBTypeEnum;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MySQLReader extends Reader {
@@ -23,18 +24,18 @@ public class MySQLReader extends Reader {
     }
 
     @Override
-    public void read(SyncData syncData, Integer interval) {
-        binlogClientConfig(syncData);
+    public void read() {
+        binlogClientConfig();
         binlogClientConnect();
     }
 
     // binlog监听客户端配置
-    private void binlogClientConfig(SyncData syncData) {
+    private void binlogClientConfig() {
         // 内部类使用限制，当前数据库名和表名
         final String[] curDataBaseName = {null};
         final String[] curTableName = {null};
 
-        binlogClient = new BinaryLogClient(getReaderConfig().getHostname(), Integer.parseInt(getReaderConfig().getPort()), getReaderConfig().getUser(), getReaderConfig().getPassword());
+        binlogClient = new BinaryLogClient(getReaderConf().getHostname(), Integer.parseInt(getReaderConf().getPort()), getReaderConf().getUser(), getReaderConf().getPassword());
         EventDeserializer eventDeserializer = new EventDeserializer();
 
         // 序列化格式设置
@@ -57,17 +58,30 @@ public class MySQLReader extends Reader {
             }
             // 获取事件类型INSERT的数据
             else if (eventData instanceof WriteRowsEventData) {
-                if (getReaderConfig().getDBName().equals(curDataBaseName[0])
-                        && getReaderConfig().getTableName().equals(curTableName[0])) {
+                if (getReaderConf().getDBName().equals(curDataBaseName[0])
+                        && getReaderConf().getTableName().equals(curTableName[0])) {
                     WriteRowsEventData writeRowsEventData = (WriteRowsEventData) eventData;
+                    SyncData syncData = new SyncData();
 
-                    // 一次获取多条数据
-                    List<List<String>> valuesData = ResultSetParseUtil.parseMySQLBinLogRows(writeRowsEventData.getRows());
+                    syncData.eventType = EventTypeEnum.INSERT;
 
-                    syncData.setEventType(EventTypeEnum.INSERT);
-                    for (List<String> values: valuesData) {
-                        syncData.setData(FieldUtil.mergeFieldAndValue(getFieldNames(), values));
-                        syncData.trigger();
+                    // 一次获取多条数据，数据格式为List<Serializable[]>
+                    for (Serializable[] dataSerializable : writeRowsEventData.getRows()) {
+                        List<String> data = new ArrayList<>();
+                        for (Serializable valueSerializable : dataSerializable) {
+                            String value = valueSerializable.toString();
+
+                            // TODO 中文编码问题
+                            if (value.equals("瀹氭椂鏁版嵁")) {
+                                value = "定时数据";
+                            }
+                            if (value.equals("澧為噺鏁版嵁")) {
+                                value = "增量数据";
+                            }
+                            data.add(value);
+                        }
+                        syncData.setData(FieldUtil.mergeFieldAndValue(getFieldNames(), data));
+                        super.trigger(syncData);
                     }
                 }
             }

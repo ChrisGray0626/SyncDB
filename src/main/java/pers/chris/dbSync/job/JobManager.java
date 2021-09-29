@@ -1,11 +1,12 @@
 package pers.chris.dbSync.job;
 
+import pers.chris.dbSync.common.typeEnum.JobTypeEnum;
 import pers.chris.dbSync.conf.DBConf;
+import pers.chris.dbSync.conf.JobConf;
 import pers.chris.dbSync.fieldMap.FieldMapManager;
 import pers.chris.dbSync.util.ConnectUtil;
 import pers.chris.dbSync.common.typeEnum.DBTypeEnum;
 import org.apache.log4j.Logger;
-import pers.chris.dbSync.util.ResultSetParseUtil;
 import pers.chris.dbSync.valueFilter.ValueFilterManager;
 
 import java.io.FileInputStream;
@@ -63,45 +64,55 @@ public class JobManager {
         connection = ConnectUtil.connect(dbType, url, user, password);
     }
 
-    public void add(String jobId) {
-        try {
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(
-                    "select * from " + syncJobConfTableName
-                            + " Where job_id=" + jobId);
-            jobs.add(ResultSetParseUtil.parseJob(resultSet));
-        } catch (SQLException e) {
-            logger.error(e);
-        }
-    }
-
     public void load() {
         try {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(
                     "select * from " + syncJobConfTableName);
-            jobs = ResultSetParseUtil.parseJobs(resultSet);
+
+            while (resultSet.next()) {
+                Job job = new Job();
+                JobConf jobConf = new JobConf();
+
+                job.setJobId(resultSet.getString("job_id"));
+                jobConf.jobType = JobTypeEnum.valueOf(resultSet.getString("job_type"));
+                jobConf.setSrcDBConfId(resultSet.getString("src_db_conf_id"));
+                jobConf.setDstDBConfId(resultSet.getString("dst_db_conf_id"));
+                jobConf.setInterval(Integer.parseInt(resultSet.getString("sync_interval")));
+                jobConf.setTimeField(resultSet.getString("sync_time_field_name"));
+                job.setJobConf(jobConf);
+
+                jobs.add(job);
+            }
         } catch (SQLException e) {
             logger.error(e);
         }
     }
 
     private DBConf readDBConf(String confId) {
-        DBConf dbConf = null;
+        DBConf dbConf = new DBConf();
 
         try {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(
                     "select * from " + DBConfTableName
             + " where conf_id=" + confId);
-            dbConf = ResultSetParseUtil.parseDBConf(resultSet);
+
+            resultSet.next();
+            dbConf.dbType = DBTypeEnum.valueOf(resultSet.getString("db_type"));
+            dbConf.setHostname(resultSet.getString("hostname"));
+            dbConf.setPort(resultSet.getString("port"));
+            dbConf.setDBName(resultSet.getString("db_name"));
+            dbConf.setUser(resultSet.getString("user"));
+            dbConf.setPassword(resultSet.getString("password"));
+            dbConf.setTableName(resultSet.getString("table_name"));
         } catch (SQLException e) {
             logger.error(e);
         }
         return dbConf;
     }
 
-    private List<String> readValueFilterRule(String jobId) {
+    private List<String> readValueFilterConf(String jobId) {
         List<String> rules = new ArrayList<>();
 
         try {
@@ -109,14 +120,18 @@ public class JobManager {
             ResultSet resultSet = statement.executeQuery(
                     "select * from " + valueFilterConfTableName
                             + " where job_id=" + jobId);
-            rules = ResultSetParseUtil.parseValueFilterConf(resultSet);
+
+            while (resultSet.next()) {
+                String rule = resultSet.getString("rule");
+                rules.add(rule);
+            }
         } catch (SQLException e) {
             logger.error(e);
         }
         return rules;
     }
 
-    private List<String> readFieldMapRule(String jobId) {
+    private List<String> readFieldMapConf(String jobId) {
         List<String> rules = new ArrayList<>();
 
         try {
@@ -124,7 +139,11 @@ public class JobManager {
             ResultSet resultSet = statement.executeQuery(
                     "select * from " + fieldMapConfTableName
             + " where job_id=" + jobId);
-            rules = ResultSetParseUtil.parseFieldMapConf(resultSet);
+
+            while (resultSet.next()) {
+                String rule = resultSet.getString("rule");
+                rules.add(rule);
+            }
         } catch (SQLException e) {
             logger.debug(e);
         }
@@ -133,16 +152,17 @@ public class JobManager {
 
     private void jobInit(Job job) {
         String jobId = job.getJobId();
-        String srcDBConfId = job.getSrcDBConfId();
-        String dstDBConfId = job.getDstDBConfId();
+        JobConf jobConf = job.getJobConf();
 
         // 源&目标数据库读取根据DBConfId
+        String srcDBConfId = jobConf.getSrcDBConfId();
+        String dstDBConfId = jobConf.getDstDBConfId();
         DBConf srcDBConf = readDBConf(srcDBConfId);
         DBConf dstDBConf = readDBConf(dstDBConfId);
 
         // 数据过滤管理器&字段映射管理器读取&加载根据JobId
-        List<String> valueFilterRules = readValueFilterRule(jobId);
-        List<String> fieldMapRules = readFieldMapRule(jobId);
+        List<String> valueFilterRules = readValueFilterConf(jobId);
+        List<String> fieldMapRules = readFieldMapConf(jobId);
         ValueFilterManager valueFilterManager = new ValueFilterManager(valueFilterRules);
         FieldMapManager fieldMapManager = new FieldMapManager(fieldMapRules);
 

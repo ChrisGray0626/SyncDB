@@ -36,10 +36,9 @@ public class Writer extends BaseWriter {
 
     @Override
     public synchronized void write(SyncData syncData) {
-        Map<String, String> rows = syncData.getData();
-        EventTypeEnum eventType = syncData.getEventType();
+        Map<String, String> data = syncData.getData();
 
-        String SQL = SQLGenerateUtil.insertSQL(getWriterConfig().getTableName(), rows);
+        String SQL = SQLGenerateUtil.insertSQL(getWriterConfig().getTableName(), data);
 
         try {
             Statement statement = connection.createStatement();

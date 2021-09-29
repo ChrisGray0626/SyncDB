@@ -13,6 +13,8 @@ import java.util.Map;
 public class FieldMapManager {
 
     private final List<FieldMapper> fieldMappers;
+    private Map<String, String> readFields;
+    private Map<String, String> writeFields;
     private final Logger logger = Logger.getLogger(FieldMapManager.class);
 
     public FieldMapManager(List<String> rules) {
@@ -47,7 +49,7 @@ public class FieldMapManager {
     }
 
     // 字段检查
-    public void ensureField(Map<String, String> writeFields, Map<String, String> readFields) {
+    public void ensureField() {
         List<String> writeFieldNames = new ArrayList<>(writeFields.keySet());
         List<String> readFieldNames = new ArrayList<>(readFields.keySet());
 
@@ -73,7 +75,7 @@ public class FieldMapManager {
     }
 
     public void run(SyncData syncData) {
-        ensureField(syncData.getWriteFields(), syncData.getReadFields());
+        ensureField();
 
         Map<String, String> data = syncData.getData();
 
@@ -84,4 +86,11 @@ public class FieldMapManager {
         syncData.setData(data);
     }
 
+    public void setReadFields(Map<String, String> readFields) {
+        this.readFields = readFields;
+    }
+
+    public void setWriteFields(Map<String, String> writeFields) {
+        this.writeFields = writeFields;
+    }
 }
