@@ -29,7 +29,7 @@ public class PostgreSQLReader extends Reader {
         while (true) {
             readLogicalSlot();
             try {
-                TimeUnit.MINUTES.sleep(super.getJobConf().getInterval());
+                TimeUnit.MINUTES.sleep(super.getSyncConf().getInterval());
             } catch (InterruptedException e) {
                 logger.error(e);
             }

@@ -13,10 +13,11 @@ public class ConnectUtil {
 
     private ConnectUtil() {}
 
-    private static final Map<DBTypeEnum, String> drivers = new HashMap<>();
+    private static final Map<DBTypeEnum, String> drivers;
     private static final Logger logger = Logger.getLogger(ConnectUtil.class);
 
     static {
+        drivers = new HashMap<>();
         drivers.put(DBTypeEnum.MYSQL, "com.mysql.cj.jdbc.Driver");
         drivers.put(DBTypeEnum.POSTGRESQL, "org.postgresql.Driver");
         drivers.put(DBTypeEnum.SQLSERVER, "com.microsoft.sqlserver.jdbc.SQLServerDriver");

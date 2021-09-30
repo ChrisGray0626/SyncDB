@@ -1,42 +1,39 @@
 package pers.chris.dbSync.valueFilter;
 
-import java.util.ArrayList;
-import java.util.List;
+import pers.chris.dbSync.conf.SyncConf;
+import pers.chris.dbSync.util.TimeUtil;
+
+import java.util.Map;
 
 public class ValueFilterManager {
 
-    private final List<ValueFilter> valueFilters;
+    private final Map<String, ValueFilter> valueFilters;
+    private SyncConf syncConf;
 
-    public ValueFilterManager (List<String> rules) {
-        valueFilters = new ArrayList<>();
-        load(rules.toArray(new String[0]));
+    public ValueFilterManager(Map<String, ValueFilter> valueFilters) {
+        this.valueFilters = valueFilters;
     }
 
-    public void add(String rule) {
-        load(rule);
-    }
-
-    public void addAll(List<String> rules) {
-        load(rules.toArray(new String[0]));
-    }
-
-    private void load(String... rules) {
-        for (String rule: rules) {
-            valueFilters.add(new ValueFilter(rule));
-        }
-    }
-
-    public String filterSQL() {
-        if (valueFilters.isEmpty()) {
-            return "";
-        }
-
+    public String run() {
         StringBuilder SQL = new StringBuilder();
-        for (ValueFilter valueFilter: valueFilters) {
-            SQL.append(valueFilter.getRule())
-                    .append(" and ");
+
+        // 第0条特殊规则
+        SQL.append(timedFilterRule());
+        for (ValueFilter valueFilter: valueFilters.values()) {
+            SQL.append(" and ")
+                    .append(valueFilter.getRule());
         }
         return SQL.toString();
     }
 
+    // 定时过滤
+    private String timedFilterRule() {
+        return syncConf.getTimeField()
+                + ">="
+                + TimeUtil.intervalTime(syncConf.getInterval());
+    }
+
+    public void setSyncConf(SyncConf syncConf) {
+        this.syncConf = syncConf;
+    }
 }

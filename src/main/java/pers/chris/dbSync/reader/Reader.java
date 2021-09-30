@@ -3,6 +3,7 @@ package pers.chris.dbSync.reader;
 import pers.chris.dbSync.common.typeEnum.EventTypeEnum;
 import pers.chris.dbSync.conf.DBConf;
 import pers.chris.dbSync.conf.JobConf;
+import pers.chris.dbSync.conf.SyncConf;
 import pers.chris.dbSync.syncData.DataEvent;
 import pers.chris.dbSync.syncData.DataListener;
 import pers.chris.dbSync.syncData.SyncData;
@@ -17,7 +18,7 @@ import java.util.Map;
 public class Reader extends BaseReader {
 
     private DBConf readerConf;
-    private JobConf jobConf;
+    private SyncConf syncConf;
     private ValueFilterManager valueFilterManager;
     private Connection connection;
     private DataListener dataListener;
@@ -49,14 +50,10 @@ public class Reader extends BaseReader {
         this.dataListener = dataListener;
     }
 
-    // 数据过滤位置
+    // 数据过滤在读取时进行
     @Override
     public void read() {
-        // TODO 时间字段过滤
-        String timeFieldName = jobConf.getTimeField(); //时间字段
-        String delayTime = TimeUtil.intervalTime(jobConf.getInterval());
-        String timeFilterSQL = SQLGenerateUtil.timeFilterSQL(timeFieldName, delayTime); // 时间过滤语句
-        String valueFilterSQL = valueFilterManager.filterSQL() + timeFilterSQL;
+        String valueFilterSQL = valueFilterManager.run();
 
         try {
             Statement statement = connection.createStatement();
@@ -100,12 +97,12 @@ public class Reader extends BaseReader {
         this.readerConf = readerConf;
     }
 
-    public JobConf getJobConf() {
-        return jobConf;
+    public SyncConf getSyncConf() {
+        return syncConf;
     }
 
-    public void setJobConf(JobConf jobConf) {
-        this.jobConf = jobConf;
+    public void setSyncConf(SyncConf syncConf) {
+        this.syncConf = syncConf;
     }
 
     public void setValueFilterManager(ValueFilterManager valueFilterManager) {

@@ -2,10 +2,7 @@ package pers.chris.dbSync.valueFilter;
 
 public class ValueFilter {
 
-    private String rule;
-
-    public ValueFilter() {
-    }
+    private final String rule;
 
     public ValueFilter(String rule) {
         this.rule = rule;
@@ -15,7 +12,4 @@ public class ValueFilter {
         return rule;
     }
 
-    public void setRule(String rule) {
-        this.rule = rule;
-    }
 }

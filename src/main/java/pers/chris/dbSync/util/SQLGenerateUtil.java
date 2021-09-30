@@ -23,9 +23,4 @@ public class SQLGenerateUtil {
         return "INSERT INTO " + tableName + fields + " VALUES" + values;
     }
 
-    // 时间过滤语句
-    public static String timeFilterSQL(String timeFieldName, String time) {
-        return timeFieldName + ">=" + time;
-    }
-
 }

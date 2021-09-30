@@ -8,8 +8,7 @@ public class JobConf {
     public JobTypeEnum jobType;
     private String dstDBConfId;
     private String srcDBConfId;
-    private Integer interval;
-    private String timeField; // 记录时间的字段名
+    private String syncConfId;
 
     public String getDstDBConfId() {
         return dstDBConfId;
@@ -27,20 +26,12 @@ public class JobConf {
         this.srcDBConfId = srcDBConfId;
     }
 
-    public Integer getInterval() {
-        return interval;
+    public String getSyncConfId() {
+        return syncConfId;
     }
 
-    public void setInterval(Integer interval) {
-        this.interval = interval;
-    }
-
-    public String getTimeField() {
-        return timeField;
-    }
-
-    public void setTimeField(String timeField) {
-        this.timeField = timeField;
+    public void setSyncConfId(String syncConfId) {
+        this.syncConfId = syncConfId;
     }
 
 }

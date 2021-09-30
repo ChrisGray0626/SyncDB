@@ -3,13 +3,10 @@ package pers.chris.dbSync.util;
 import org.apache.log4j.Logger;
 import pers.chris.dbSync.common.FieldTypeEnum;
 import pers.chris.dbSync.exception.FieldMapException;
-import pers.chris.dbSync.fieldMap.FieldMapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class FieldUtil {
 
@@ -111,48 +108,6 @@ public class FieldUtil {
         if (srcFieldType != dstFieldType) {
             throw new FieldMapException("Type Error: " + srcFieldName + "'s type is not adapted to " + dstFieldName);
         }
-    }
-
-    // 规则语法检查
-    public static void checkRuleSyntax(String rule)
-            throws FieldMapException {
-        Pattern pattern = Pattern.compile("\\{.*?\\}=(([\\s\\S]*)\\{.*?\\})+");
-        Matcher matcher = pattern.matcher(rule);
-
-        if (!matcher.matches()) {
-            throw new FieldMapException("Rule Syntax Error: '" + rule + "' exists syntax error");
-        }
-    }
-
-    public static FieldMapper parseRule(String rule) {
-        List<String> srcFields = new ArrayList<>();
-        List<String> dstFields = new ArrayList<>();
-
-        // 匹配目标字段
-        Pattern dstPattern = Pattern.compile("(?<=\\{).*?(?=\\}=)");
-        Matcher dstMatcher = dstPattern.matcher(rule);
-        while (dstMatcher.find()) {
-            dstFields.add(dstMatcher.group(0));
-        }
-
-        // 去除目标字段内容
-        rule = rule.replaceAll("\\{.*?\\}=", "");
-
-        // 匹配源字段
-        Pattern srcPattern = Pattern.compile("(?<=\\{).*?(?=\\})");
-        Matcher srcMatcher = srcPattern.matcher(rule);
-        while (srcMatcher.find()) {
-            srcFields.add(srcMatcher.group(0));
-        }
-
-        // 替换源字段内容
-        rule = rule.replaceAll("\\{.*?\\}", "%s");
-
-        FieldMapper fieldMapper = new FieldMapper();
-        fieldMapper.setDstFieldNames(dstFields);
-        fieldMapper.setSrcFieldNames(srcFields);
-        fieldMapper.setRule(rule);
-        return fieldMapper;
     }
 
 }

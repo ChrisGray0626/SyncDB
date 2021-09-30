@@ -20,7 +20,7 @@ public class SQLServerReader extends Reader {
 
     @Override
     public void read() {
-        Integer interval = super.getJobConf().getInterval();
+        Integer interval = super.getSyncConf().getInterval();
 
         while (true) {
             readCDCTable(interval);

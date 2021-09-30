@@ -1,7 +1,9 @@
 package pers.chris.dbSync.job;
 
+import pers.chris.dbSync.common.typeEnum.JobTypeEnum;
 import pers.chris.dbSync.conf.DBConf;
 import pers.chris.dbSync.conf.JobConf;
+import pers.chris.dbSync.conf.SyncConf;
 import pers.chris.dbSync.fieldMap.FieldMapManager;
 import pers.chris.dbSync.reader.BaseReader;
 import pers.chris.dbSync.reader.Reader;
@@ -19,22 +21,23 @@ public class Job implements Runnable {
     private JobConf jobConf;
     private DBConf dstDBConf;
     private DBConf srcDBConf;
+    private SyncConf syncConf;
     private ValueFilterManager valueFilterManager;
     private FieldMapManager fieldMapManager;
-//    private SyncData syncData;
     private Reader reader;
     private Writer writer;
     private final Logger logger = Logger.getLogger(Job.class);
 
     @Override
     public void run() {
+        JobTypeEnum jobType = jobConf.jobType;
         // Job信息打印
         console();
 
-        reader = BaseReader.getInstance(jobConf.jobType, srcDBConf.dbType);
-        writer = BaseWriter.getInstance(jobConf.jobType, dstDBConf.dbType);
+        reader = BaseReader.getInstance(jobType, srcDBConf.dbType);
+        writer = BaseWriter.getInstance(jobType, dstDBConf.dbType);
 
-        reader.setJobConf(jobConf);
+        reader.setSyncConf(syncConf);
         reader.setReaderConf(srcDBConf);
         writer.setWriterConfig(dstDBConf);
 
@@ -46,8 +49,10 @@ public class Job implements Runnable {
         writer.readField();
         fieldMapManager.setReadFields(reader.getFields());
         fieldMapManager.setWriteFields(writer.getFields());
+        fieldMapManager.load();
 
         // 数据过滤在读取时完成
+        valueFilterManager.setSyncConf(syncConf);
         reader.setValueFilterManager(valueFilterManager);
 
         // 监听器注册，数据发生变化时执行后续流程
@@ -57,7 +62,7 @@ public class Job implements Runnable {
             writer.write(syncData);
         });
 
-        switch (jobConf.jobType) {
+        switch (jobType) {
             case TIMED:
                 runTimed();
                 break;
@@ -69,7 +74,7 @@ public class Job implements Runnable {
     }
 
     public void runTimed() {
-        int interval = jobConf.getInterval();
+        int interval = syncConf.getInterval();
 
         while (true) {
             reader.read();
@@ -102,20 +107,16 @@ public class Job implements Runnable {
         this.jobId = jobId;
     }
 
-    public DBConf getDstDBConf() {
-        return dstDBConf;
-    }
-
     public void setDstDBConf(DBConf dstDBConf) {
         this.dstDBConf = dstDBConf;
     }
 
-    public DBConf getSrcDBConf() {
-        return srcDBConf;
-    }
-
     public void setSrcDBConf(DBConf srcDBConf) {
         this.srcDBConf = srcDBConf;
+    }
+
+    public void setSyncConf(SyncConf syncConf) {
+        this.syncConf = syncConf;
     }
 
     public JobConf getJobConf() {
@@ -126,16 +127,8 @@ public class Job implements Runnable {
         this.jobConf = jobConf;
     }
 
-    public ValueFilterManager getValueFilterManager() {
-        return valueFilterManager;
-    }
-
     public void setValueFilterManager(ValueFilterManager valueFilterManager) {
         this.valueFilterManager = valueFilterManager;
-    }
-
-    public FieldMapManager getFieldMapManager() {
-        return fieldMapManager;
     }
 
     public void setFieldMapManager(FieldMapManager fieldMapManager) {
