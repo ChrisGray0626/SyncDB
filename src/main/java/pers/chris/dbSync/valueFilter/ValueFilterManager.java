@@ -28,9 +28,9 @@ public class ValueFilterManager {
 
     // 定时过滤
     private String timedFilterRule() {
-        return syncConf.getTimeField()
+        return syncConf.timeField
                 + ">="
-                + TimeUtil.intervalTime(syncConf.getInterval());
+                + TimeUtil.intervalTime(syncConf.interval);
     }
 
     public void setSyncConf(SyncConf syncConf) {

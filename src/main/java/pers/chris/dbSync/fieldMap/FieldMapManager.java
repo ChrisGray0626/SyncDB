@@ -47,24 +47,24 @@ public class FieldMapManager {
     public void parseRule(FieldMapper fieldMapper) {
         String rule = fieldMapper.getRule();
 
-        // 匹配目标字段
+        // 匹配目标字段"{DstFieldName}"
         Pattern dstPattern = Pattern.compile("(?<=\\{).*?(?=\\}=)");
         Matcher dstMatcher = dstPattern.matcher(rule);
         while (dstMatcher.find()) {
             fieldMapper.getDstFieldNames().add(dstMatcher.group(0));
         }
 
-        // 去除目标字段内容
+        // 去除目标字段内容"{DstFieldName}="
         rule = rule.replaceAll("\\{.*?\\}=", "");
 
-        // 匹配源字段
+        // 匹配源字段"{SrcFieldName}"
         Pattern srcPattern = Pattern.compile("(?<=\\{).*?(?=\\})");
         Matcher srcMatcher = srcPattern.matcher(rule);
         while (srcMatcher.find()) {
             fieldMapper.getSrcFieldNames().add(srcMatcher.group(0));
         }
 
-        // 替换源字段内容
+        // 替换源字段内容"{SrcFieldName}"为"%s"
         rule = rule.replaceAll("\\{.*?\\}", "%s");
 
         fieldMapper.setRule(rule);

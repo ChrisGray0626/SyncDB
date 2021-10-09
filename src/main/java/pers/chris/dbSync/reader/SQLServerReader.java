@@ -20,7 +20,7 @@ public class SQLServerReader extends Reader {
 
     @Override
     public void read() {
-        Integer interval = super.getSyncConf().getInterval();
+        Integer interval = super.getSyncConf().interval;
 
         while (true) {
             readCDCTable(interval);
@@ -41,7 +41,7 @@ public class SQLServerReader extends Reader {
             ResultSet resultSet = statement.executeQuery(
                     "DECLARE @bglsn VARBINARY(10)=sys.fn_cdc_map_time_to_lsn('smallest greater than or equal',DATEADD(mi,-" + interval + ",GETDATE()));"
                     + "DECLARE @edlsn VARBINARY(10)=sys.fn_cdc_map_time_to_lsn('largest less than or equal',GETDATE());"
-                    + "SELECT * FROM cdc.dbo_" + getReaderConf().getTableName() + "_CT "
+                    + "SELECT * FROM cdc.dbo_" + getReaderConf().tableName + "_CT "
                             + "WHERE [__$start_lsn] BETWEEN @bglsn AND @edlsn");
 
             while (resultSet.next()) {
@@ -79,8 +79,6 @@ public class SQLServerReader extends Reader {
                 eventType = EventTypeEnum.INSERT;
                 break;
             case "3":
-                eventType = EventTypeEnum.UPDATE;
-                break;
             case "4":
                 eventType = EventTypeEnum.UPDATE;
                 break;

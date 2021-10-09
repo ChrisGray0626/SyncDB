@@ -29,7 +29,7 @@ public class PostgreSQLReader extends Reader {
         while (true) {
             readLogicalSlot();
             try {
-                TimeUnit.MINUTES.sleep(super.getSyncConf().getInterval());
+                TimeUnit.MINUTES.sleep(getSyncConf().interval);
             } catch (InterruptedException e) {
                 logger.error(e);
             }
@@ -62,7 +62,7 @@ public class PostgreSQLReader extends Reader {
                 String curTableName = originalData1[1].replace(":", "");
                 EventTypeEnum eventType = EventTypeEnum.valueOf(originalData[2].replace(":", ""));
 
-                if (!curTableName.equals(getReaderConf().getTableName())) {
+                if (!curTableName.equals(getReaderConf().tableName)) {
                     continue;
                 }
 

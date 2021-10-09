@@ -35,7 +35,7 @@ public class MySQLReader extends Reader {
         final String[] curDataBaseName = {null};
         final String[] curTableName = {null};
 
-        binlogClient = new BinaryLogClient(getReaderConf().getHostname(), Integer.parseInt(getReaderConf().getPort()), getReaderConf().getUser(), getReaderConf().getPassword());
+        binlogClient = new BinaryLogClient(getReaderConf().hostname, Integer.parseInt(getReaderConf().port), getReaderConf().user, getReaderConf().password);
         EventDeserializer eventDeserializer = new EventDeserializer();
 
         // 序列化格式设置
@@ -58,8 +58,8 @@ public class MySQLReader extends Reader {
             }
             // 获取事件类型INSERT的数据
             else if (eventData instanceof WriteRowsEventData) {
-                if (getReaderConf().getDBName().equals(curDataBaseName[0])
-                        && getReaderConf().getTableName().equals(curTableName[0])) {
+                if (getReaderConf().dbName.equals(curDataBaseName[0])
+                        && getReaderConf().tableName.equals(curTableName[0])) {
                     WriteRowsEventData writeRowsEventData = (WriteRowsEventData) eventData;
                     SyncData syncData = new SyncData();
 

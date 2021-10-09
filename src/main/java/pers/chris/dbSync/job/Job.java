@@ -8,14 +8,17 @@ import pers.chris.dbSync.fieldMap.FieldMapManager;
 import pers.chris.dbSync.reader.BaseReader;
 import pers.chris.dbSync.reader.Reader;
 import pers.chris.dbSync.syncData.SyncData;
+import pers.chris.dbSync.util.TimeUtil;
 import pers.chris.dbSync.valueFilter.ValueFilterManager;
 import pers.chris.dbSync.writer.BaseWriter;
 import pers.chris.dbSync.writer.Writer;
 import org.apache.log4j.Logger;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-public class Job implements Runnable {
+public class Job extends Thread {
 
     private String jobId;
     private JobConf jobConf;
@@ -26,14 +29,18 @@ public class Job implements Runnable {
     private FieldMapManager fieldMapManager;
     private Reader reader;
     private Writer writer;
+    public static Map<String, Thread> curThreads = new HashMap<>();
     private final Logger logger = Logger.getLogger(Job.class);
 
     @Override
     public void run() {
-        JobTypeEnum jobType = jobConf.jobType;
         // Job信息打印
         console();
 
+        // 当前线程存放
+        curThreads.put(jobId, Thread.currentThread());
+
+        JobTypeEnum jobType = jobConf.jobType;
         reader = BaseReader.getInstance(jobType, srcDBConf.dbType);
         writer = BaseWriter.getInstance(jobType, dstDBConf.dbType);
 
@@ -74,16 +81,12 @@ public class Job implements Runnable {
     }
 
     public void runTimed() {
-        int interval = syncConf.getInterval();
+        int interval = syncConf.interval;
 
-        while (true) {
+        // 线程中断信号检测
+        while (!Thread.currentThread().isInterrupted()) {
             reader.read();
-            try {
-                TimeUnit.MINUTES.sleep(interval);
-            }
-            catch (InterruptedException e) {
-                logger.error(e);
-            }
+            TimeUtil.sleep(interval);
         }
     }
 

@@ -13,7 +13,6 @@ public class DBSync {
         JobManager jobManager = new JobManager();
 
         jobManager.init(confFileName);
-        jobManager.connect();
         jobManager.load();
         jobManager.run();
     }

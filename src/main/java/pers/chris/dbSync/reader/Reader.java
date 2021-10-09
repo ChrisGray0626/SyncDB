@@ -26,7 +26,7 @@ public class Reader extends BaseReader {
 
     @Override
     public void connect() {
-        connection = ConnectUtil.connect(getReaderConf().dbType, getReaderConf().getUrl(), getReaderConf().getUser(), getReaderConf().getPassword());
+        connection = ConnectUtil.connect(getReaderConf().dbType, getReaderConf().getUrl(), getReaderConf().user, getReaderConf().password);
     }
 
     // 读取字段信息（名字、类型）
@@ -34,7 +34,7 @@ public class Reader extends BaseReader {
     public void readField() {
         try {
             DatabaseMetaData metaData = connection.getMetaData();
-            ResultSet resultSet = metaData.getColumns(null, "%", getReaderConf().getTableName(), "%");
+            ResultSet resultSet = metaData.getColumns(null, "%", getReaderConf().tableName, "%");
             setFields(FieldUtil.read(resultSet));
 
         } catch (SQLException e) {
@@ -58,7 +58,7 @@ public class Reader extends BaseReader {
         try {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(
-                    "select * from " + getReaderConf().getTableName()
+                    "select * from " + getReaderConf().tableName
                             + " where " + valueFilterSQL);
 
             while (resultSet.next()) {

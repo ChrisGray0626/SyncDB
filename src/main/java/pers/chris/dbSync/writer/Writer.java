@@ -19,14 +19,14 @@ public class Writer extends BaseWriter {
 
     @Override
     public void connect() {
-        connection = ConnectUtil.connect(getWriterConfig().dbType, getWriterConfig().getUrl(), getWriterConfig().getUser(), getWriterConfig().getPassword());
+        connection = ConnectUtil.connect(getWriterConfig().dbType, getWriterConfig().getUrl(), getWriterConfig().user, getWriterConfig().password);
     }
 
     @Override
     public void readField() {
         try {
             DatabaseMetaData metaData = connection.getMetaData();
-            ResultSet resultSet = metaData.getColumns(null, "%", getWriterConfig().getTableName(), "%");
+            ResultSet resultSet = metaData.getColumns(null, "%", getWriterConfig().tableName, "%");
             setFields(FieldUtil.read(resultSet));
         }
         catch (SQLException e) {
@@ -38,7 +38,7 @@ public class Writer extends BaseWriter {
     public synchronized void write(SyncData syncData) {
         Map<String, String> data = syncData.getData();
 
-        String SQL = SQLGenerateUtil.insertSQL(getWriterConfig().getTableName(), data);
+        String SQL = SQLGenerateUtil.insertSQL(getWriterConfig().tableName, data);
 
         try {
             Statement statement = connection.createStatement();
