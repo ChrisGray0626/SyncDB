@@ -1,57 +1,42 @@
 package pers.chris.dbSync.fieldMap;
 
 import org.apache.log4j.Logger;
-import pers.chris.dbSync.exception.FieldMapException;
+import pers.chris.dbSync.common.module.Module;
 
 import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-public class FieldMapper {
+public class FieldMapper extends Module {
 
-    private String rule; // 映射规则
     private final List<String> dstFieldNames; // 目标字段
     private final List<String> srcFieldNames; // 源字段
     private final Logger logger = Logger.getLogger(FieldMapper.class);
 
     public FieldMapper(String rule) {
+        super(rule);
         dstFieldNames = new ArrayList<>();
         srcFieldNames = new ArrayList<>();
-        this.rule = rule;
     }
 
-    public Map<String, String> map(Map<String, String> rows) {
+    public void run(Map<String, String> data) {
         // 当前仅支持映射到唯一目标字段
         String dstField = dstFieldNames.get(0);
         List<String> srcValues = new ArrayList<>();
         for (String srcField: srcFieldNames) {
-            srcValues.add(rows.get(srcField));
+            srcValues.add(data.get(srcField));
         }
-
         // 格式化目标值
         Formatter formatter = new Formatter();
-        formatter.format(rule, srcValues.toArray());
+        formatter.format(super.getRule(), srcValues.toArray());
         String dstValue = formatter.toString();
-
         // 移除源字段
         for (String srcField: srcFieldNames) {
-            rows.remove(srcField);
+            data.remove(srcField);
         }
-
         // 新增目标字段
-        rows.put(dstField, dstValue);
-        return rows;
-    }
-
-    public String getRule() {
-        return rule;
-    }
-
-    public void setRule(String rule) {
-        this.rule = rule;
+        data.put(dstField, dstValue);
     }
 
     public List<String> getDstFieldNames() {
