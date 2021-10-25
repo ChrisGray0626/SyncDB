@@ -1,15 +1,18 @@
 package pers.chris.dbSync.valueFilter;
 
-public class ValueFilter {
+import pers.chris.dbSync.common.module.Module;
 
-    private final String rule;
+import java.util.Map;
+
+public class ValueFilter extends Module {
 
     public ValueFilter(String rule) {
-        this.rule = rule;
+        super(rule);
     }
 
-    public String getRule() {
-        return rule;
+    @Override
+    public void run(Map<String, String> data) {
+
     }
 
 }

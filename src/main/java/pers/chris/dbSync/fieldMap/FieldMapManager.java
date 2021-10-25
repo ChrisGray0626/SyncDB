@@ -24,12 +24,14 @@ public class FieldMapManager extends ModuleManager {
         this.fieldMappers = fieldMappers;
     }
 
+    @Override
     public void load() {
         checkRule();
         parseRule();
         checkField();
     }
 
+    @Override
     public void checkRule() {
         for (FieldMapper fieldMapper: fieldMappers.values()) {
             String rule = fieldMapper.getRule();
@@ -45,6 +47,7 @@ public class FieldMapManager extends ModuleManager {
         }
     }
 
+    @Override
     public void parseRule() {
         for (FieldMapper fieldMapper: fieldMappers.values()) {
             String rule = fieldMapper.getRule();
@@ -67,7 +70,7 @@ public class FieldMapManager extends ModuleManager {
             fieldMapper.setRule(rule);
         }
     }
-    // 字段检查
+
     public void checkField() {
         for (FieldMapper fieldMapper: fieldMappers.values()) {
             List<String> dstFieldNames = fieldMapper.getDstFieldNames();
@@ -83,6 +86,7 @@ public class FieldMapManager extends ModuleManager {
         }
     }
 
+    @Override
     public void run(SyncData syncData) {
         Map<String, String> data = syncData.getData();
 

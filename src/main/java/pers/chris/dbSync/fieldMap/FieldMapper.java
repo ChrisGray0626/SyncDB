@@ -20,6 +20,7 @@ public class FieldMapper extends Module {
         srcFieldNames = new ArrayList<>();
     }
 
+    @Override
     public void run(Map<String, String> data) {
         // 当前仅支持映射到唯一目标字段
         String dstField = dstFieldNames.get(0);

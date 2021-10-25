@@ -60,6 +60,7 @@ public class Job extends Thread {
 
         // 数据过滤在读取时完成
         valueFilterManager.setSyncConf(syncConf);
+        valueFilterManager.load();
         reader.setValueFilterManager(valueFilterManager);
 
         // 监听器注册，数据发生变化时执行后续流程

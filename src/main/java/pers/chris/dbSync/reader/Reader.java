@@ -53,7 +53,7 @@ public class Reader extends BaseReader {
     // 数据过滤在读取时进行
     @Override
     public void read() {
-        String valueFilterSQL = valueFilterManager.run();
+        String valueFilterSQL = valueFilterManager.getFilterSQL();
 
         try {
             Statement statement = connection.createStatement();
